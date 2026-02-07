@@ -84,7 +84,7 @@ export default function Lessons() {
 
                     {/* Bookmark icon */}
                     <div className="flex items-center justify-center pr-4">
-                      <BookmarksIcon className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                      <Bookmark className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
                     </div>
                   </div>
                 </div>
