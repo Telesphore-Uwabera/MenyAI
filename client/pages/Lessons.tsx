@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Layout from '@/components/Layout';
-import { ChevronLeft, BookmarksIcon } from 'lucide-react';
+import { ChevronLeft, Bookmark } from 'lucide-react';
 
 interface Lesson {
   id: number;
