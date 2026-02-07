@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import Layout from '@/components/Layout';
-import { ChevronLeft, Bookmark } from 'lucide-react';
+import { useState } from "react";
+import Layout from "@/components/Layout";
+import { ChevronLeft, Bookmark } from "lucide-react";
 
 interface Lesson {
   id: number;
@@ -10,26 +10,26 @@ interface Lesson {
 }
 
 export default function Lessons() {
-  const [selectedLevel] = useState('Ikirenga 1');
+  const [selectedLevel] = useState("Ikirenga 1");
 
   const lessons: Lesson[] = [
     {
       id: 1,
-      title: 'Hitamo Icyciro',
-      image: '🌾',
-      category: 'Amasomo',
+      title: "Hitamo Icyciro",
+      image: "🌾",
+      category: "Amasomo",
     },
     {
       id: 2,
-      title: 'Gahunda y\'Amasomo',
-      image: '👨‍👩‍👧‍👦',
-      category: 'Ubwigize',
+      title: "Gahunda y'Amasomo",
+      image: "👨‍👩‍👧‍👦",
+      category: "Ubwigize",
     },
     {
       id: 3,
-      title: 'Imirimo y\'Amasomo',
-      image: '🏃',
-      category: 'Ubwigize',
+      title: "Imirimo y'Amasomo",
+      image: "🏃",
+      category: "Ubwigize",
     },
   ];
 

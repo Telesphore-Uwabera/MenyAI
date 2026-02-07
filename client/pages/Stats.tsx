@@ -1,5 +1,5 @@
-import Layout from '@/components/Layout';
-import { BarChart3, ArrowRight } from 'lucide-react';
+import Layout from "@/components/Layout";
+import { BarChart3, ArrowRight } from "lucide-react";
 
 export default function Stats() {
   return (
@@ -11,13 +11,11 @@ export default function Stats() {
               <BarChart3 className="w-8 h-8 text-primary" />
             </div>
           </div>
-          <h1 className="text-2xl font-bold text-foreground mb-2">
-            Ibikorwa
-          </h1>
+          <h1 className="text-2xl font-bold text-foreground mb-2">Ibikorwa</h1>
           <p className="text-muted-foreground mb-8">
             Reba inyandiko y'aho wanduye mu masomo
           </p>
-          
+
           <div className="bg-muted/30 border border-border rounded-lg p-8 text-center">
             <p className="text-sm text-muted-foreground mb-4">
               Kuri ibi bikorwa, komeza kwiga!

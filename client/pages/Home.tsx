@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ChevronRight, Sparkles } from 'lucide-react';
-import Layout from '@/components/Layout';
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { ChevronRight, Sparkles } from "lucide-react";
+import Layout from "@/components/Layout";
 
 export default function Home() {
-  const [userName] = useState('Alice');
+  const [userName] = useState("Alice");
 
   return (
     <Layout>
@@ -43,7 +43,9 @@ export default function Home() {
               <div className="flex items-center gap-2 mb-4">
                 <div className="flex">
                   {[...Array(4)].map((_, i) => (
-                    <span key={i} className="text-yellow-400 text-lg">★</span>
+                    <span key={i} className="text-yellow-400 text-lg">
+                      ★
+                    </span>
                   ))}
                   <span className="text-gray-300 text-lg">★</span>
                 </div>
