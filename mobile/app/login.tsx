@@ -19,7 +19,7 @@ export default function LoginScreen() {
         contentContainerStyle={{ padding: spacing.md, paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header: Iterambere + Kwiga Rwanda + language pill */}
+        {/* Header: Iterambere + MenyAI */}
         <View style={{ marginBottom: spacing.lg }}>
           <Text style={{ fontSize: fontSize.sm, color: colors.mutedForeground, marginBottom: spacing.xs }}>
             Iterambere
@@ -29,7 +29,7 @@ export default function LoginScreen() {
               <View style={{ width: 28, height: 28, borderRadius: 6, backgroundColor: colors.primary, alignItems: "center", justifyContent: "center" }}>
                 <Ionicons name="book" size={16} color="#fff" />
               </View>
-              <Text style={{ fontSize: fontSize.xl, fontWeight: "700", color: colors.foreground }}>Kwiga Rwanda</Text>
+              <Text style={{ fontSize: fontSize.xl, fontWeight: "700", color: colors.foreground }}>MenyAI</Text>
             </View>
           </View>
         </View>

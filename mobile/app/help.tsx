@@ -6,8 +6,8 @@ import { colors, spacing, fontSize, borderRadius } from "@/theme";
 
 const FAQ_ITEMS = [
   {
-    q: "Ni iki Kwiga Rwanda?",
-    a: "Kwiga Rwanda ni porogaramu yo kwiga gusoma no kwandika mu Kinyarwanda. Yateguwe kugira ngo abanyarwanda bose bashobore gusoma no kwandika neza.",
+    q: "Ni iki MenyAI?",
+    a: "MenyAI ni porogaramu yo kwiga gusoma no kwandika mu Kinyarwanda. Yateguwe kugira ngo abanyarwanda bose bashobore gusoma no kwandika neza.",
   },
   {
     q: "Ntangira he?",

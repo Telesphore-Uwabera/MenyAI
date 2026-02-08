@@ -47,7 +47,7 @@ export default function AboutScreen() {
           <Ionicons name="book" size={40} color={colors.primaryForeground} />
         </View>
         <Text style={{ fontSize: fontSize["2xl"], fontWeight: "700", color: colors.foreground, marginBottom: spacing.xs }}>
-          Kwiga Rwanda
+          MenyAI
         </Text>
         <Text style={{ fontSize: fontSize.sm, color: colors.mutedForeground, marginBottom: spacing.xl }}>
           Verisiyo 1.0.0
@@ -66,7 +66,7 @@ export default function AboutScreen() {
           }}
         >
           <Text style={{ fontSize: fontSize.base, color: colors.foreground, lineHeight: 24, textAlign: "center" }}>
-            Kwiga Rwanda ni porogaramu yo kwiga gusoma no kwandika mu Kinyarwanda, yateguwe kugira ngo abanyarwanda
+            MenyAI ni porogaramu yo kwiga gusoma no kwandika mu Kinyarwanda, yateguwe kugira ngo abanyarwanda
             bose bashobore gukoresha neza ururimi rwabo.
           </Text>
         </View>

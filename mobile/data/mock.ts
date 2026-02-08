@@ -1,5 +1,5 @@
 /**
- * Mock data for Kwiga Rwanda app. Replace with Firebase when ready.
+ * Mock data for MenyAI app. Replace with Firebase when ready.
  */
 
 export const MOCK_USER = {

@@ -1,4 +1,4 @@
-# Kwiga Rwanda – Architecture & Improvements
+# MenyAI – Architecture & Improvements
 
 ## How the Project Works
 

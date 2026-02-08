@@ -1,4 +1,4 @@
-# Kwiga Rwanda (MenyAI)
+# MenyAI
 
 Mobile app for the AI-powered literacy platform (Kinyarwanda only). Built with **React Native (Expo)** and **Firebase** for the backend. Uses mock data by default.
 
