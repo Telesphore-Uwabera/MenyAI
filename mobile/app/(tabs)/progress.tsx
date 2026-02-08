@@ -21,7 +21,7 @@ export default function ProgressScreen() {
       </View>
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={{ padding: spacing.md, paddingBottom: spacing.xl * 2 }}
+        contentContainerStyle={{ padding: spacing.md, paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
       >
         <View

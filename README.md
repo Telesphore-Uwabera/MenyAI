@@ -1,11 +1,11 @@
 # Kwiga Rwanda (MenyAI)
 
-Mobile app for the AI-powered literacy platform (Kinyarwanda/English). Built with **React Native (Expo)** and **Firebase** for the backend. Uses mock data by default.
+Mobile app for the AI-powered literacy platform (Kinyarwanda only). Built with **React Native (Expo)** and **Firebase** for the backend. Uses mock data by default.
 
 ## Screens
 
-- **Login** – Phone + PIN, “Injira”, language toggle
-- **Home** – Greeting, “Amasomo” / “Amasomo yose”, offline banner
+- **Login** – Phone + PIN, “Injira”
+- **Home** – Greeting, “Amasomo” / “Amasomo yose”
 - **Lessons** – Level picker, lesson cards (completed / download)
 - **Yiga (Learn/[level])** – Lesson list per level
 - **Practice (Iyitoze)** – Match word to image

@@ -11,7 +11,7 @@ export default function AccountScreen() {
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["top"]}>
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={{ padding: spacing.md, paddingBottom: spacing.xl * 2, alignItems: "center" }}
+        contentContainerStyle={{ padding: spacing.md, paddingBottom: 100, alignItems: "center" }}
         showsVerticalScrollIndicator={false}
       >
         <View style={{ marginTop: spacing.lg, marginBottom: spacing.md }}>
@@ -35,9 +35,13 @@ export default function AccountScreen() {
           Menya ibyacu kuri inzira yacu
         </Text>
 
-        <View
+        <TouchableOpacity
+          onPress={() => router.push("/profile")}
           style={{
             marginTop: spacing.xl,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
             padding: spacing.lg,
             backgroundColor: colors.muted,
             borderRadius: 12,
@@ -45,22 +49,37 @@ export default function AccountScreen() {
             borderColor: colors.border,
             width: "100%",
             maxWidth: 400,
-            alignItems: "center",
           }}
         >
-          <Text style={{ fontSize: fontSize.sm, color: colors.mutedForeground, marginBottom: spacing.md, textAlign: "center" }}>
-            Iyi page izaba irangira vuba!
-          </Text>
-          <TouchableOpacity
-            onPress={() => router.replace("/(tabs)")}
-            style={{ flexDirection: "row", alignItems: "center", gap: spacing.sm }}
-          >
-            <Text style={{ fontSize: fontSize.base, fontWeight: "600", color: colors.primary }}>
-              Subiza Nyumba
-            </Text>
-            <Ionicons name="arrow-forward" size={18} color={colors.primary} />
-          </TouchableOpacity>
-        </View>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.md }}>
+            <Ionicons name="person" size={24} color={colors.primary} />
+            <Text style={{ fontSize: fontSize.base, fontWeight: "600", color: colors.foreground }}>Guhindura amakuru</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color={colors.mutedForeground} />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => router.push("/settings")}
+          style={{
+            marginTop: spacing.xl,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: spacing.lg,
+            backgroundColor: colors.muted,
+            borderRadius: 12,
+            borderWidth: 1,
+            borderColor: colors.border,
+            width: "100%",
+            maxWidth: 400,
+          }}
+        >
+          <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.md }}>
+            <Ionicons name="settings" size={24} color={colors.primary} />
+            <Text style={{ fontSize: fontSize.base, fontWeight: "600", color: colors.foreground }}>Igenamiterere</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color={colors.mutedForeground} />
+        </TouchableOpacity>
 
         <TouchableOpacity
           onPress={() => router.replace("/login")}

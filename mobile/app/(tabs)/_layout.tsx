@@ -9,15 +9,21 @@ export default function TabLayout() {
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.mutedForeground,
-        tabBarStyle: { backgroundColor: colors.background, borderTopColor: colors.border },
-        tabBarLabelStyle: { fontSize: 12 },
+        tabBarStyle: {
+          backgroundColor: colors.background,
+          borderTopColor: colors.border,
+          borderTopWidth: 1,
+          paddingTop: 8,
+          height: 64,
+        },
+        tabBarLabelStyle: { fontSize: 11, fontWeight: "500" },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
           title: "Amasomo",
-          tabBarIcon: ({ color, size }) => <Ionicons name="book" size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => <Ionicons name="home" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
@@ -31,6 +37,13 @@ export default function TabLayout() {
         name="activities"
         options={{
           title: "Ibikorwa",
+          tabBarIcon: ({ color, size }) => <Ionicons name="checkbox" size={size} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="practice"
+        options={{
+          title: "Iyitoze",
           tabBarIcon: ({ color, size }) => <Ionicons name="bar-chart" size={size} color={color} />,
         }}
       />
@@ -41,13 +54,9 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => <Ionicons name="person" size={size} color={color} />,
         }}
       />
-      <Tabs.Screen
-        name="lessons"
-        options={{
-          href: null,
-          title: "Amasomo yose",
-        }}
-      />
+      <Tabs.Screen name="levels" options={{ href: null }} />
+      <Tabs.Screen name="lessons" options={{ href: null }} />
+      <Tabs.Screen name="learn/[level]" options={{ href: null }} />
     </Tabs>
   );
 }
