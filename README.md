@@ -39,7 +39,7 @@ mobile/
 ├── app/              # Expo Router (tabs + stack)
 ├── components/ui/    # Button, Card, Input
 ├── data/mock.ts      # Mock data – replace with Firebase when ready
-├── lib/firebase.ts   # Firebase config (add your keys)
+├── lib/firebase.ts   # Firebase config (add keys)
 ├── theme.ts
 └── package.json
 ```
@@ -58,5 +58,5 @@ All content comes from **`mobile/data/mock.ts`**. Edit it to change what the app
 
 1. Create a project at [Firebase Console](https://console.firebase.google.com).
 2. Add Android/iOS apps and copy the config.
-3. Edit **`mobile/lib/firebase.ts`**: uncomment the code and set your `firebaseConfig`.
+3. Edit **`mobile/lib/firebase.ts`**: uncomment the code and set the `firebaseConfig`.
 4. Use Firebase Auth and Firestore instead of `data/mock.ts`.
