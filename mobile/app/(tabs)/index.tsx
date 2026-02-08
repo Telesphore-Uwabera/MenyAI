@@ -3,8 +3,7 @@ import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors, spacing, fontSize, borderRadius } from "@/theme";
-import { Button } from "@/components/ui/Button";
-import { MOCK_USER } from "@/data/mock";
+import { MOCK_USER, MOCK_PROGRESS } from "@/data/mock";
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -17,115 +16,189 @@ export default function HomeScreen() {
         contentContainerStyle={{ padding: spacing.md, paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
-        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: spacing.md }}>
-          <Text style={{ fontSize: fontSize.sm, color: colors.primary }}>Kwiga Rwanda</Text>
-          <TouchableOpacity style={{ padding: spacing.sm }}>
-            <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: colors.primaryMuted, alignItems: "center", justifyContent: "center" }}>
-              <Ionicons name="volume-high" size={20} color={colors.primary} />
-            </View>
-          </TouchableOpacity>
-        </View>
-
-        {/* Greeting */}
-        <View style={{ marginBottom: spacing.lg }}>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.sm, marginBottom: spacing.xs }}>
+        {/* Top Bar - Greeting + Profile icon */}
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: spacing.lg,
+            paddingBottom: spacing.md,
+            borderBottomWidth: 1,
+            borderBottomColor: colors.border,
+          }}
+        >
+          <View>
             <Text style={{ fontSize: fontSize["2xl"], fontWeight: "700", color: colors.foreground }}>
               Muraho, {userName}!
             </Text>
-            <TouchableOpacity>
-              <Ionicons name="volume-high" size={22} color={colors.primary} />
-            </TouchableOpacity>
+            <Text style={{ fontSize: fontSize.sm, color: colors.mutedForeground, marginTop: 2 }}>
+              Komeza kwiga neza
+            </Text>
           </View>
-          <Text style={{ fontSize: fontSize.base, color: colors.mutedForeground }}>
-            Ni he ushaka kwiga uyu munsi?
-          </Text>
+          <TouchableOpacity
+            onPress={() => router.push("/(tabs)/account")}
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: 22,
+              backgroundColor: colors.accentOrange,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Text style={{ fontSize: 18, fontWeight: "700", color: "#fff" }}>A</Text>
+          </TouchableOpacity>
         </View>
 
-        {/* Hero illustration area - market scene */}
-        <View
+        {/* Featured Lesson Card - Primary green gradient */}
+        <TouchableOpacity
+          onPress={() => router.push("/(tabs)/lessons")}
           style={{
-            height: 220,
-            backgroundColor: colors.primaryMuted,
+            backgroundColor: colors.primary,
             borderRadius: borderRadius.lg,
+            padding: spacing.lg,
             marginBottom: spacing.md,
-            overflow: "hidden",
-            alignItems: "center",
-            justifyContent: "center",
           }}
         >
-          <Ionicons name="leaf" size={64} color={colors.primary} />
-          <Text style={{ fontSize: fontSize.sm, color: colors.mutedForeground, marginTop: spacing.sm }}>Isoko • Kwiga gusoma no kwandika</Text>
-        </View>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.sm, marginBottom: spacing.sm }}>
+            <Ionicons name="locate" size={20} color="#fff" />
+            <Text style={{ fontSize: fontSize.lg, fontWeight: "700", color: "#fff" }}>
+              Isomo Ryawe Rya None
+            </Text>
+          </View>
+          <Text style={{ fontSize: fontSize.sm, color: "rgba(255,255,255,0.95)", marginBottom: spacing.md, lineHeight: 22 }}>
+            Kwiga gusoma amagambo yibanze mu Kinyarwanda
+          </Text>
+          <TouchableOpacity
+            onPress={() => router.push("/(tabs)/lessons")}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: spacing.sm,
+              backgroundColor: "#fff",
+              paddingVertical: spacing.sm,
+              paddingHorizontal: spacing.lg,
+              borderRadius: borderRadius.md,
+              alignSelf: "flex-start",
+            }}
+          >
+            <Ionicons name="play" size={18} color={colors.primary} />
+            <Text style={{ fontSize: fontSize.sm, fontWeight: "600", color: colors.primary }}>
+              Tangira Isomo
+            </Text>
+          </TouchableOpacity>
+        </TouchableOpacity>
 
-        {/* Tags: Kinyarwanda (green + book), Intangiriro (gray + chart), Ubwisanzure (checkmark) */}
-        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: spacing.sm, marginBottom: spacing.md }}>
-          <TouchableOpacity
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: spacing.xs,
-              backgroundColor: colors.primary,
-              paddingHorizontal: spacing.md,
-              paddingVertical: spacing.sm,
-              borderRadius: borderRadius.full,
-            }}
-          >
-            <Ionicons name="book" size={14} color={colors.primaryForeground} />
-            <Text style={{ fontSize: fontSize.xs, color: colors.primaryForeground }}>Kinyarwanda</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: spacing.xs,
-              backgroundColor: colors.muted,
-              paddingHorizontal: spacing.md,
-              paddingVertical: spacing.sm,
-              borderRadius: borderRadius.full,
-            }}
-          >
-            <Ionicons name="bar-chart" size={14} color={colors.foreground} />
-            <Text style={{ fontSize: fontSize.xs, color: colors.foreground }}>Intangiriro</Text>
-          </TouchableOpacity>
+        {/* Stats Grid */}
+        <View style={{ flexDirection: "row", gap: spacing.md, marginBottom: spacing.lg }}>
           <View
             style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: spacing.xs,
-              backgroundColor: colors.primaryMuted,
-              paddingHorizontal: spacing.md,
-              paddingVertical: spacing.sm,
-              borderRadius: borderRadius.full,
+              flex: 1,
+              backgroundColor: colors.card,
+              borderRadius: borderRadius.md,
+              padding: spacing.md,
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.08,
+              shadowRadius: 8,
+              elevation: 2,
             }}
           >
-            <Ionicons name="checkmark-circle" size={14} color={colors.primary} />
-            <Text style={{ fontSize: fontSize.xs, color: colors.primary }}>Ubwisanzure</Text>
+            <Text style={{ fontSize: fontSize["3xl"], fontWeight: "800", color: colors.primary, marginBottom: 4 }}>
+              {MOCK_PROGRESS.completedLessons}
+            </Text>
+            <Text style={{ fontSize: fontSize.xs, color: colors.mutedForeground }}>Amasomo Yarangiye</Text>
+          </View>
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: colors.card,
+              borderRadius: borderRadius.md,
+              padding: spacing.md,
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.08,
+              shadowRadius: 8,
+              elevation: 2,
+            }}
+          >
+            <Text style={{ fontSize: fontSize["3xl"], fontWeight: "800", color: colors.primary, marginBottom: 4 }}>
+              {MOCK_PROGRESS.remainingLessons ?? MOCK_PROGRESS.totalLessons - MOCK_PROGRESS.completedLessons}
+            </Text>
+            <Text style={{ fontSize: fontSize.xs, color: colors.mutedForeground }}>Amasomo Asigaye</Text>
           </View>
         </View>
 
-        {/* CTA Buttons */}
-        <Button
-          title="Amasomo"
-          onPress={() => router.push("/(tabs)/levels")}
-          icon={<Ionicons name="chevron-forward" size={20} color={colors.primaryForeground} />}
-          style={{ marginBottom: spacing.sm }}
-        />
+        {/* Ibikorwa Byihuse - Quick Actions */}
+        <Text style={{ fontSize: fontSize.xl, fontWeight: "700", color: colors.foreground, marginBottom: spacing.md }}>
+          Ibikorwa Byihuse
+        </Text>
+
         <TouchableOpacity
+          onPress={() => router.push("/(tabs)/lessons")}
+          style={{
+            backgroundColor: colors.card,
+            borderRadius: borderRadius.lg,
+            padding: spacing.lg,
+            marginBottom: spacing.md,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.08,
+            shadowRadius: 8,
+            elevation: 2,
+          }}
+        >
+          <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.sm, marginBottom: spacing.sm }}>
+            <Ionicons name="book" size={20} color={colors.primary} />
+            <Text style={{ fontSize: fontSize.lg, fontWeight: "700", color: colors.foreground }}>Amasomo</Text>
+          </View>
+          <Text style={{ fontSize: fontSize.sm, color: colors.mutedForeground, lineHeight: 22 }}>
+            Reba amasomo yose akugenewe
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => router.push("/(tabs)/progress")}
+          style={{
+            backgroundColor: colors.card,
+            borderRadius: borderRadius.lg,
+            padding: spacing.lg,
+            marginBottom: spacing.md,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.08,
+            shadowRadius: 8,
+            elevation: 2,
+          }}
+        >
+          <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.sm, marginBottom: spacing.sm }}>
+            <Ionicons name="stats-chart" size={20} color={colors.primary} />
+            <Text style={{ fontSize: fontSize.lg, fontWeight: "700", color: colors.foreground }}>Iterambere</Text>
+          </View>
+          <Text style={{ fontSize: fontSize.sm, color: colors.mutedForeground, lineHeight: 22 }}>
+            Reba uko witeze imbere
+          </Text>
+        </TouchableOpacity>
+
+        {/* AI Assistant Button - Purple gradient */}
+        <TouchableOpacity
+          onPress={() => router.push("/ai-assistant")}
           style={{
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "center",
-            paddingVertical: spacing.md,
-            backgroundColor: colors.muted,
-            borderRadius: borderRadius.md,
             gap: spacing.sm,
+            backgroundColor: colors.aiPurpleStart,
+            paddingVertical: spacing.md,
+            paddingHorizontal: spacing.lg,
+            borderRadius: borderRadius.md,
+            marginTop: spacing.sm,
           }}
-          onPress={() => router.push("/(tabs)/lessons")}
         >
-          <Ionicons name="grid" size={20} color={colors.foreground} />
-          <Text style={{ fontSize: fontSize.base, fontWeight: "500", color: colors.foreground }}>
-            Amasomo yose
+          <Ionicons name="chatbubble-ellipses" size={22} color="#fff" />
+          <Text style={{ fontSize: fontSize.base, fontWeight: "600", color: "#fff" }}>
+            Baza AI Umufasha
           </Text>
         </TouchableOpacity>
       </ScrollView>

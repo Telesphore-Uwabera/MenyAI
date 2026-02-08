@@ -13,7 +13,7 @@ export default function LoginScreen() {
   const [pin, setPin] = useState("");
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#f0f0f0" }} edges={["top"]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["top"]}>
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{ padding: spacing.md, paddingBottom: 100 }}
@@ -26,7 +26,7 @@ export default function LoginScreen() {
           </Text>
           <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
             <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.sm }}>
-              <View style={{ width: 28, height: 28, borderRadius: 6, backgroundColor: "#2563eb", alignItems: "center", justifyContent: "center" }}>
+              <View style={{ width: 28, height: 28, borderRadius: 6, backgroundColor: colors.primary, alignItems: "center", justifyContent: "center" }}>
                 <Ionicons name="book" size={16} color="#fff" />
               </View>
               <Text style={{ fontSize: fontSize.xl, fontWeight: "700", color: colors.foreground }}>Kwiga Rwanda</Text>
@@ -129,7 +129,7 @@ export default function LoginScreen() {
             <Text style={{ fontSize: fontSize.xs, color: colors.mutedForeground }}>Wibagiwe PIN?</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => router.push("/forgot-pin")}>
-            <Text style={{ fontSize: fontSize.xs, color: "#2563eb", fontWeight: "500" }}>Saba indi PIN</Text>
+            <Text style={{ fontSize: fontSize.xs, color: colors.primary, fontWeight: "500" }}>Saba indi PIN</Text>
           </TouchableOpacity>
         </View>
 

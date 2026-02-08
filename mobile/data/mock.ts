@@ -95,9 +95,55 @@ export const MOCK_ACTIVITIES = [
   { id: "3", title: "Gusoma n'ijwi", date: "Uwa gatanu", count: 5, icon: "volume-high" as const },
 ];
 
-/** Progress stats (mock) */
+/** Progress stats (mock) - matches HTML design */
 export const MOCK_PROGRESS = {
-  completedLessons: 3,
-  totalLessons: 12,
+  completedLessons: 12,
+  totalLessons: 50,
+  remainingLessons: 38,
   streakDays: 5,
+};
+
+/** Lesson list for Amasomo tab - matches HTML design */
+export const MOCK_LESSON_LIST = [
+  {
+    id: "1",
+    title: "Isomo 1: Amagambo Yibanze",
+    duration: "12 min",
+    meta: "Ijwi + Amashusho",
+    progress: 100,
+    status: "completed" as const,
+    icon: "nutrition" as const,
+    gradient: ["#FFE5B4", "#FFDAB9"],
+  },
+  {
+    id: "2",
+    title: "Isomo 2: Imibare",
+    duration: "15 min",
+    meta: "Ijwi + Amashusho",
+    progress: 45,
+    status: "progress" as const,
+    icon: "calculator" as const,
+    gradient: ["#B4E5FF", "#B9D9FF"],
+  },
+  {
+    id: "3",
+    title: "Isomo 3: Gusoma Imiti",
+    duration: "10 min",
+    meta: "Ijwi + Amashusho",
+    progress: 0,
+    status: "new" as const,
+    icon: "medical" as const,
+    gradient: ["#E5FFB4", "#D9FFB9"],
+  },
+];
+
+/** Active lesson quiz - matches HTML design (Gatanu/Gatandatu) */
+export const MOCK_LESSON_QUIZ = {
+  question: "Hitamo igisubizo cyiza:",
+  visual: { value: "5", label: "Gatanu" },
+  options: [
+    { key: "A", text: "Gatanu", correct: true },
+    { key: "B", text: "Gatandatu", correct: false },
+    { key: "C", text: "Kane", correct: false },
+  ],
 };

@@ -2,7 +2,7 @@ import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { colors, spacing, fontSize } from "@/theme";
+import { colors, spacing, fontSize, borderRadius } from "@/theme";
 
 export default function AccountScreen() {
   const router = useRouter();
@@ -43,12 +43,17 @@ export default function AccountScreen() {
             alignItems: "center",
             justifyContent: "space-between",
             padding: spacing.lg,
-            backgroundColor: colors.muted,
-            borderRadius: 12,
+            backgroundColor: colors.card,
+            borderRadius: borderRadius.md,
             borderWidth: 1,
             borderColor: colors.border,
             width: "100%",
             maxWidth: 400,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.08,
+            shadowRadius: 8,
+            elevation: 2,
           }}
         >
           <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.md }}>
@@ -66,12 +71,17 @@ export default function AccountScreen() {
             alignItems: "center",
             justifyContent: "space-between",
             padding: spacing.lg,
-            backgroundColor: colors.muted,
-            borderRadius: 12,
+            backgroundColor: colors.card,
+            borderRadius: borderRadius.md,
             borderWidth: 1,
             borderColor: colors.border,
             width: "100%",
             maxWidth: 400,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.08,
+            shadowRadius: 8,
+            elevation: 2,
           }}
         >
           <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.md }}>

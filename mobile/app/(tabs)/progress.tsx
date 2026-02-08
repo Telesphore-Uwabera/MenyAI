@@ -1,7 +1,7 @@
 import { View, Text, ScrollView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { colors, spacing, fontSize } from "@/theme";
+import { colors, spacing, fontSize, borderRadius } from "@/theme";
 import { MOCK_PROGRESS } from "@/data/mock";
 
 export default function ProgressScreen() {
@@ -11,7 +11,7 @@ export default function ProgressScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["top"]}>
-      <View style={{ padding: spacing.md }}>
+      <View style={{ padding: spacing.md, marginBottom: spacing.sm }}>
         <Text style={{ fontSize: fontSize["2xl"], fontWeight: "700", color: colors.foreground }}>
           Iterambere
         </Text>
@@ -24,14 +24,18 @@ export default function ProgressScreen() {
         contentContainerStyle={{ padding: spacing.md, paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
       >
+        {/* Progress bar card */}
         <View
           style={{
             backgroundColor: colors.card,
-            borderWidth: 1,
-            borderColor: colors.border,
-            borderRadius: 12,
+            borderRadius: borderRadius.lg,
             padding: spacing.lg,
-            marginBottom: spacing.md,
+            marginBottom: spacing.lg,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.08,
+            shadowRadius: 8,
+            elevation: 2,
           }}
         >
           <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: spacing.sm }}>
@@ -52,14 +56,20 @@ export default function ProgressScreen() {
             {MOCK_PROGRESS.completedLessons} / {MOCK_PROGRESS.totalLessons} amasomo
           </Text>
         </View>
+
+        {/* Streak card */}
         <View
           style={{
             alignItems: "center",
             justifyContent: "center",
             paddingVertical: spacing.xl,
-            backgroundColor: colors.muted,
-            borderRadius: 12,
-            marginHorizontal: spacing.md,
+            backgroundColor: colors.card,
+            borderRadius: borderRadius.lg,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.08,
+            shadowRadius: 8,
+            elevation: 2,
           }}
         >
           <View
@@ -75,7 +85,7 @@ export default function ProgressScreen() {
           >
             <Ionicons name="flame" size={40} color={colors.primary} />
           </View>
-          <Text style={{ fontSize: fontSize.lg, fontWeight: "600", color: colors.foreground }}>
+          <Text style={{ fontSize: fontSize.xl, fontWeight: "700", color: colors.foreground }}>
             Umunsi {MOCK_PROGRESS.streakDays} – streak!
           </Text>
           <Text style={{ fontSize: fontSize.sm, color: colors.mutedForeground, marginTop: spacing.sm, textAlign: "center" }}>

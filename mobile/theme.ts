@@ -1,21 +1,27 @@
 /**
- * Kwiga Rwanda – design tokens (matches web primary green)
- * Primary: HSL 147 65% 47% ≈ #2d8a4e
+ * MenyAI – design system (matches menyai-ui-design.html)
+ * Primary: #2D9B5F, Dark: #1F7A47
  */
 export const colors = {
-  primary: "#2d8a4e",
-  primaryForeground: "#ffffff",
-  primaryMuted: "#e8f5ec",
-  background: "#ffffff",
-  foreground: "#333333",
-  muted: "#f5f5f5",
-  mutedForeground: "#737373",
-  border: "#e5e5e5",
-  card: "#ffffff",
-  warning: "#eab308",
-  warningBg: "#fef9c3",
-  orange: "#ea580c",
-  orangeBg: "#fff7ed",
+  primary: "#2D9B5F",
+  primaryDark: "#1F7A47",
+  primaryLight: "#4CAF78",
+  primaryForeground: "#FFFFFF",
+  primaryMuted: "#E8F5E9",
+  accentYellow: "#FFB84D",
+  accentOrange: "#FF8C42",
+  aiPurpleStart: "#667EEA",
+  aiPurpleEnd: "#764BA2",
+  background: "#FAF8F5",
+  backgroundAlt: "#F0EDE8",
+  foreground: "#1A1A1A",
+  muted: "#F5F5F5",
+  mutedForeground: "#666666",
+  border: "#E5E5E5",
+  card: "#FFFFFF",
+  success: "#27AE60",
+  warning: "#F57C00",
+  warningBg: "#FFF3E0",
 } as const;
 
 export const spacing = {
@@ -35,10 +41,11 @@ export const borderRadius = {
 } as const;
 
 export const fontSize = {
-  xs: 12,
+  xs: 11,
   sm: 14,
   base: 16,
   lg: 18,
   xl: 20,
   "2xl": 24,
+  "3xl": 28,
 } as const;
