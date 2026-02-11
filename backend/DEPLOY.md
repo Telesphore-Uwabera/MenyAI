@@ -1,6 +1,16 @@
 # Deploy MenyAI Backend
 
-Follow these steps after you’ve pushed your code and configured env vars locally.
+**Order: 1. Push code → 2. Deploy Railway → 3. Configure Firebase**
+
+---
+
+## Order of operations
+
+| Step | Action |
+|------|--------|
+| **1. Push** | Code is already on GitHub (e.g. `Telesphore-Uwabera/MenyAI`). |
+| **2. Railway first** | Deploy backend to Railway (Section 3 below). Get the live URL; no Firebase needed yet. |
+| **3. Firebase next** | Create Firebase project, get service account JSON, add `FIREBASE_SERVICE_ACCOUNT_JSON` to Railway. |
 
 ---
 
@@ -172,3 +182,33 @@ To get **FIREBASE_SERVICE_ACCOUNT_JSON**:
 | URL | Generate domain | *.onrender.com | *.fly.dev |
 
 Once this is done, your backend is deployed and the app can use the real API URL via `EXPO_PUBLIC_API_URL`.
+
+---
+
+## 8. Next: Firebase (after Railway is live)
+
+Do this **after** your backend is deployed and `/health` works.
+
+1. **Create a Firebase project**  
+   - Go to [Firebase Console](https://console.firebase.google.com).  
+   - Add project (e.g. **MenyAI**).  
+   - Enable **Authentication** (e.g. Phone, Email).  
+   - Create a **Firestore** database (test or production).
+
+2. **Get the service account key**  
+   - Firebase Console → Project settings (gear) → **Service accounts**.  
+   - Click **Generate new private key** → download the JSON file.  
+   - Open the file, copy the **entire** JSON (one line is fine).
+
+3. **Add it to Railway**  
+   - Railway → your backend service → **Variables**.  
+   - Add variable: **Name** `FIREBASE_SERVICE_ACCOUNT_JSON`, **Value** = paste the full JSON string.  
+   - Save; Railway will redeploy.  
+   - Do **not** commit this JSON file to Git.
+
+4. **Wire the mobile app (optional)**  
+   - In Firebase Console, add an **Android** and/or **iOS** app; copy the config.  
+   - In the repo, edit **`mobile/lib/firebase.ts`**: uncomment the code and set `firebaseConfig`.  
+   - Users can then sign in; send the Firebase ID token in the `Authorization` header so the backend can use Firestore/Auth.
+
+After this, your backend uses Firestore for lessons/progress and Firebase Auth for protected routes.
