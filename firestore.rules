@@ -1,0 +1,20 @@
+rules_version = '2';
+
+// MenyAI – Firestore security rules
+// Backend (Admin SDK) bypasses these; rules apply to direct client access (e.g. mobile).
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Lessons: read-only for authenticated users (app may read; writes go via backend admin API).
+    match /lessons/{lessonId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // Progress: each user can read/write only their own document (uid == document id).
+    match /progress/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}

@@ -28,3 +28,6 @@ dist-ssr
 
 # Firebase service account keys (never commit)
 *-firebase-adminsdk-*.json
+
+# Snapshots / generated
+.snapshots
