@@ -1,11 +1,14 @@
 /**
  * Firebase configuration and helpers.
  * Config from google-services.json (Android) / GoogleService-Info.plist (iOS).
+ * Auth: on native uses React Native persistence (AsyncStorage); on web uses getAuth().
  */
 
+import { Platform } from "react-native";
 import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, initializeAuth, getReactNativePersistence, type Auth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCybgVvn-UjlYPItthJhbWlxZKU0znUpm4",
@@ -17,6 +20,7 @@ const firebaseConfig = {
 };
 
 let app: FirebaseApp | undefined;
+let authInstance: Auth | undefined;
 
 export function getFirebaseApp(): FirebaseApp {
   if (!app) {
@@ -25,7 +29,24 @@ export function getFirebaseApp(): FirebaseApp {
   return app;
 }
 
-export const auth = () => getAuth(getFirebaseApp());
+export function getAuthInstance(): Auth {
+  if (!authInstance) {
+    const a = getFirebaseApp();
+    const isWeb = Platform.OS === "web";
+    const hasRNPersistence =
+      typeof getReactNativePersistence === "function";
+    if (isWeb || !hasRNPersistence) {
+      authInstance = getAuth(a);
+    } else {
+      authInstance = initializeAuth(a, {
+        persistence: getReactNativePersistence(AsyncStorage),
+      });
+    }
+  }
+  return authInstance;
+}
+
+export const auth = () => getAuthInstance();
 export const db = () => getFirestore(getFirebaseApp());
 
 export const firebaseReady = true;

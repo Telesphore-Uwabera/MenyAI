@@ -3,9 +3,16 @@ import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors, spacing, fontSize, borderRadius } from "@/theme";
+import { useAuth } from "@/lib/auth-context";
 
 export default function AccountScreen() {
   const router = useRouter();
+  const { logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    router.replace("/login");
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["top"]}>
@@ -92,7 +99,7 @@ export default function AccountScreen() {
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={() => router.replace("/login")}
+          onPress={handleLogout}
           style={{ marginTop: spacing.xl, paddingVertical: spacing.sm }}
         >
           <Text style={{ fontSize: fontSize.sm, color: colors.mutedForeground }}>Gusohoka / Injira</Text>

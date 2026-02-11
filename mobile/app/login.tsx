@@ -1,16 +1,41 @@
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
-import { useRouter } from "expo-router";
+import { View, Text, ScrollView, TouchableOpacity, Alert } from "react-native";
+import { useRouter, Redirect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors, spacing, fontSize, borderRadius } from "@/theme";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { useAuth } from "@/lib/auth-context";
 import { useState } from "react";
 
 export default function LoginScreen() {
   const router = useRouter();
-  const [phone, setPhone] = useState("+250 7XX XXX XXX");
+  const { user, login, error, clearError, loading: authLoading } = useAuth();
+  const [phone, setPhone] = useState("");
   const [pin, setPin] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  if (!authLoading && user) {
+    return <Redirect href="/(tabs)" />;
+  }
+
+  const handleLogin = async () => {
+    const trimmedPhone = phone.trim();
+    if (!trimmedPhone) {
+      Alert.alert("", "Shyiramo nimero ya telefoni.");
+      return;
+    }
+    setLoading(true);
+    clearError();
+    try {
+      await login(trimmedPhone, pin);
+      router.replace("/(tabs)");
+    } catch {
+      // error shown via useAuth().error
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["top"]}>
@@ -90,19 +115,26 @@ export default function LoginScreen() {
         </Text>
         <Input
           label="PIN"
-          placeholder="Imibare 4"
+          placeholder="Imibare 6"
           value={pin}
           onChangeText={setPin}
           secureTextEntry
           keyboardType="number-pad"
-          maxLength={4}
+          maxLength={6}
           rightIcon={<Ionicons name="volume-high" size={20} color={colors.mutedForeground} />}
           containerStyle={{ marginBottom: spacing.lg }}
         />
 
+        {error ? (
+          <Text style={{ fontSize: fontSize.sm, color: colors.warning, marginBottom: spacing.md }}>
+            {error}
+          </Text>
+        ) : null}
+
         <Button
           title="Injira"
-          onPress={() => router.replace("/(tabs)")}
+          onPress={handleLogin}
+          loading={loading}
           icon={<Ionicons name="chevron-forward" size={20} color={colors.primaryForeground} />}
           style={{ marginBottom: spacing.md }}
         />

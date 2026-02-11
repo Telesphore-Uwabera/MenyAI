@@ -10,6 +10,8 @@ const { initFirebase } = require("./config/firebase");
 const lessonsRouter = require("./routes/lessons");
 const progressRouter = require("./routes/progress");
 const aiRouter = require("./routes/ai");
+const authRouter = require("./routes/auth");
+const adminRouter = require("./routes/admin");
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -26,6 +28,8 @@ app.get("/health", (req, res) => {
 app.use("/api/lessons", lessonsRouter);
 app.use("/api/progress", progressRouter);
 app.use("/api/ai", aiRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/admin", adminRouter);
 
 app.listen(PORT, () => {
   console.log(`MenyAI backend running on http://localhost:${PORT}`);

@@ -1,16 +1,42 @@
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
-import { useRouter } from "expo-router";
+import { View, Text, ScrollView, TouchableOpacity, Alert } from "react-native";
+import { useRouter, Redirect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors, spacing, fontSize, borderRadius } from "@/theme";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { useAuth } from "@/lib/auth-context";
 import { useState } from "react";
 
 export default function RegisterScreen() {
   const router = useRouter();
+  const { user, register: doRegister, error, clearError, loading: authLoading } = useAuth();
   const [phone, setPhone] = useState("");
   const [name, setName] = useState("");
+  const [pin, setPin] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  if (!authLoading && user) {
+    return <Redirect href="/(tabs)" />;
+  }
+
+  const handleRegister = async () => {
+    const trimmedPhone = phone.trim();
+    if (!trimmedPhone) {
+      Alert.alert("", "Shyiramo nimero ya telefoni.");
+      return;
+    }
+    setLoading(true);
+    clearError();
+    try {
+      await doRegister(trimmedPhone, name.trim(), pin);
+      router.replace("/(tabs)");
+    } catch {
+      // error shown via useAuth().error
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["top"]}>
@@ -43,6 +69,20 @@ export default function RegisterScreen() {
           value={phone}
           onChangeText={setPhone}
           keyboardType="phone-pad"
+          containerStyle={{ marginBottom: spacing.md }}
+        />
+
+        <Text style={{ fontSize: fontSize.sm, color: colors.mutedForeground, marginBottom: spacing.sm }}>
+          PIN (imibare 6)
+        </Text>
+        <Input
+          label="PIN"
+          placeholder="Imibare 6"
+          value={pin}
+          onChangeText={setPin}
+          secureTextEntry
+          keyboardType="number-pad"
+          maxLength={6}
           containerStyle={{ marginBottom: spacing.lg }}
         />
 
@@ -50,9 +90,16 @@ export default function RegisterScreen() {
           Uzahabwa PIN nshya ku telefoni yawe nyuma yo kwiyandikisha.
         </Text>
 
+        {error ? (
+          <Text style={{ fontSize: fontSize.sm, color: colors.warning, marginBottom: spacing.md }}>
+            {error}
+          </Text>
+        ) : null}
+
         <Button
           title="Yandika"
-          onPress={() => router.replace("/(tabs)")}
+          onPress={handleRegister}
+          loading={loading}
           style={{ marginBottom: spacing.md }}
         />
 

@@ -4,7 +4,7 @@
  */
 import { Platform } from "react-native";
 
-const getBaseUrl = (): string => {
+export const getBaseUrl = (): string => {
   if (typeof process !== "undefined" && process.env?.EXPO_PUBLIC_API_URL) {
     return process.env.EXPO_PUBLIC_API_URL.replace(/\/$/, "");
   }
