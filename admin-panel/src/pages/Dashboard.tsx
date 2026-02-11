@@ -65,7 +65,10 @@ export default function Dashboard() {
   return (
     <div>
       <div className="admin-page-header">
-        <h1 className="admin-page-title">Dashboard</h1>
+        <div>
+          <h1 className="admin-page-title">Dashboard</h1>
+          <p className="admin-page-subtitle">Overview of lessons, users, and progress.</p>
+        </div>
         <button
           type="button"
           onClick={load}

@@ -56,7 +56,9 @@ export default function Layout() {
         </div>
       </aside>
       <main className="admin-main">
-        <Outlet />
+        <div className="admin-main-inner">
+          <Outlet />
+        </div>
       </main>
     </div>
   );

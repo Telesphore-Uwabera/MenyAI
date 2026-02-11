@@ -101,7 +101,10 @@ export default function Lessons() {
   return (
     <div>
       <div className="admin-page-header">
-        <h1 className="admin-page-title">Lessons</h1>
+        <div>
+          <h1 className="admin-page-title">Lessons</h1>
+          <p className="admin-page-subtitle">Manage lesson content.</p>
+        </div>
         <div style={{ display: "flex", gap: "0.75rem" }}>
           <button type="button" onClick={load} disabled={loading} className="admin-btn admin-btn-secondary">
             {loading ? "Refreshing…" : "Refresh"}

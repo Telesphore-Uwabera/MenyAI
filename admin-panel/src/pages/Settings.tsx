@@ -28,6 +28,7 @@ export default function Settings() {
   return (
     <div>
       <h1 className="admin-page-title">Backend configuration</h1>
+      <p className="admin-page-subtitle">Set the API URL for this admin panel.</p>
       <div className="admin-card admin-card-body" style={{ maxWidth: 520 }}>
         <p style={{ margin: "0 0 1rem", color: "var(--text-muted)", fontSize: "0.9rem" }}>
           Set the MenyAI backend URL. Leave empty to use the dev proxy (localhost:4000). For production or a remote backend, enter the full URL (e.g. https://menyai-nslw.onrender.com).

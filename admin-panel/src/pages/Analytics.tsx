@@ -140,7 +140,10 @@ export default function Analytics() {
   return (
     <div>
       <div className="admin-page-header">
-        <h1 className="admin-page-title">Advanced Analytics</h1>
+        <div>
+          <h1 className="admin-page-title">Advanced Analytics</h1>
+          <p className="admin-page-subtitle">Engagement and content metrics.</p>
+        </div>
         <button
           type="button"
           onClick={load}

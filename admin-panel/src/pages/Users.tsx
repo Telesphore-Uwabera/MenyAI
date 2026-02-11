@@ -43,7 +43,10 @@ export default function Users() {
   return (
     <div>
       <div className="admin-page-header">
-        <h1 className="admin-page-title">Users</h1>
+        <div>
+          <h1 className="admin-page-title">Users</h1>
+          <p className="admin-page-subtitle">Registered app users.</p>
+        </div>
         <button type="button" onClick={load} disabled={loading} className="admin-btn admin-btn-secondary">
           {loading ? "Refreshing…" : "Refresh"}
         </button>
