@@ -1,11 +1,8 @@
 import { useEffect, useState } from "react";
+import { BookOpen, Users, Activity, RefreshCw } from "lucide-react";
 import { api, type Stats } from "../lib/api";
 
-const STAT_ICONS: Record<string, string> = {
-  Lessons: "📚",
-  Users: "👥",
-  "Progress records": "📈",
-};
+const CARD_ICON_SIZE = 22;
 
 export default function Dashboard() {
   const [stats, setStats] = useState<Stats | null>(null);
@@ -50,9 +47,19 @@ export default function Dashboard() {
   }
 
   const cards = [
-    { label: "Lessons", value: stats!.totalLessons },
-    { label: "Users", value: stats!.totalUsers },
-    { label: "Progress records", value: stats!.totalProgressDocs },
+    {
+      label: "Lessons",
+      value: stats!.totalLessons,
+      icon: BookOpen,
+      color: "var(--primary)",
+    },
+    { label: "Users", value: stats!.totalUsers, icon: Users, color: "#1976d2" },
+    {
+      label: "Progress records",
+      value: stats!.totalProgressDocs,
+      icon: Activity,
+      color: "#7b1fa2",
+    },
   ];
 
   return (
@@ -65,13 +72,16 @@ export default function Dashboard() {
           disabled={loading}
           className="admin-btn admin-btn-secondary"
         >
+          <RefreshCw size={18} className={loading ? "admin-spinner-icon" : ""} />
           {loading ? "Refreshing…" : "Refresh"}
         </button>
       </div>
       <div className="admin-stat-cards">
-        {cards.map(({ label, value }) => (
-          <div key={label} className="admin-stat-card">
-            <div className="admin-stat-card-icon">{STAT_ICONS[label] ?? "•"}</div>
+        {cards.map(({ label, value, icon: Icon, color }) => (
+          <div key={label} className="admin-stat-card admin-stat-card-with-icon">
+            <div className="admin-stat-card-icon" style={{ background: `${color}18`, color }}>
+              <Icon size={CARD_ICON_SIZE} strokeWidth={2} />
+            </div>
             <div className="admin-stat-card-label">{label}</div>
             <div className="admin-stat-card-value">{value}</div>
           </div>

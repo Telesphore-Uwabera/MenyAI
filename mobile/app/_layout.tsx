@@ -7,7 +7,7 @@ import { BottomNav } from "@/components/BottomNav";
 export default function RootLayout() {
   const segments = useSegments();
   const isInTabs = segments[0] === "(tabs)";
-  const showBottomNav = !isInTabs;
+  const showBottomNav = isInTabs;
 
   return (
     <AuthProvider>

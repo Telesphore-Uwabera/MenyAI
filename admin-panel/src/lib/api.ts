@@ -48,7 +48,14 @@ export async function api<T>(path: string, options?: RequestInit): Promise<T> {
     headers: { ...getHeaders(), ...options?.headers } as HeadersInit,
   });
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error((data as { error?: string }).error || res.statusText);
+  if (!res.ok) {
+    const msg = (data as { error?: string }).error || res.statusText;
+    const friendly =
+      res.status === 503
+        ? "Backend or database unavailable. Start the backend (port 4000) and set FIREBASE_SERVICE_ACCOUNT_JSON in backend/.env."
+        : msg;
+    throw new Error(friendly);
+  }
   return data as T;
 }
 

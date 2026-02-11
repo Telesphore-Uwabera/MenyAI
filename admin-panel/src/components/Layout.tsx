@@ -1,12 +1,22 @@
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
+import {
+  LayoutDashboard,
+  BookOpen,
+  Users,
+  TrendingUp,
+  BarChart3,
+  Settings,
+  LogOut,
+} from "lucide-react";
 import { clearAdminKey } from "../lib/api";
 
 const nav = [
-  { to: "/", label: "Dashboard", icon: "📊" },
-  { to: "/lessons", label: "Lessons", icon: "📚" },
-  { to: "/users", label: "Users", icon: "👥" },
-  { to: "/progress", label: "Progress", icon: "📈" },
-  { to: "/settings", label: "Settings", icon: "⚙️" },
+  { to: "/", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/lessons", label: "Lessons", icon: BookOpen },
+  { to: "/users", label: "Users", icon: Users },
+  { to: "/progress", label: "Progress", icon: TrendingUp },
+  { to: "/analytics", label: "Analytics", icon: BarChart3 },
+  { to: "/settings", label: "Settings", icon: Settings },
 ];
 
 export default function Layout() {
@@ -20,7 +30,7 @@ export default function Layout() {
       <aside className="admin-sidebar">
         <div className="admin-sidebar-brand">MenyAI Admin</div>
         <nav>
-          {nav.map(({ to, label, icon }) => (
+          {nav.map(({ to, label, icon: Icon }) => (
             <NavLink
               key={to}
               to={to}
@@ -29,7 +39,7 @@ export default function Layout() {
                 "admin-sidebar-nav-link" + (isActive ? " active" : "")
               }
             >
-              <span className="admin-nav-icon" aria-hidden>{icon}</span>
+              <Icon size={18} strokeWidth={2} className="admin-nav-icon-svg" />
               {label}
             </NavLink>
           ))}
@@ -40,6 +50,7 @@ export default function Layout() {
             onClick={logout}
             className="admin-btn admin-btn-secondary admin-btn-logout"
           >
+            <LogOut size={16} />
             Log out
           </button>
         </div>
