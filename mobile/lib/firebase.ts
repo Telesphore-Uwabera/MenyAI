@@ -1,37 +1,31 @@
 /**
  * Firebase configuration and helpers.
- * Add your Firebase project config from the Firebase console, then uncomment and use.
- *
- * 1. Create a project at https://console.firebase.google.com
- * 2. Add Android/iOS apps and get the config
- * 3. Install: pnpm add firebase
- * 4. Replace the placeholder below with initializeApp(firebaseConfig)
- * 5. Use Firestore, Auth, etc. instead of mock data in data/mock.ts
+ * Config from google-services.json (Android) / GoogleService-Info.plist (iOS).
  */
 
-// import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
-// import { getAuth } from "firebase/auth";
-// import { getFirestore } from "firebase/firestore";
+import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
-// const firebaseConfig = {
-//   apiKey: "YOUR_API_KEY",
-//   authDomain: "YOUR_PROJECT.firebaseapp.com",
-//   projectId: "YOUR_PROJECT_ID",
-//   storageBucket: "YOUR_PROJECT.appspot.com",
-//   messagingSenderId: "YOUR_SENDER_ID",
-//   appId: "YOUR_APP_ID",
-// };
+const firebaseConfig = {
+  apiKey: "AIzaSyCybgVvn-UjlYPItthJhbWlxZKU0znUpm4",
+  authDomain: "menyai-27cfc.firebaseapp.com",
+  projectId: "menyai-27cfc",
+  storageBucket: "menyai-27cfc.firebasestorage.app",
+  messagingSenderId: "973511634165",
+  appId: "1:973511634165:android:1fce7b24de7995550569bc",
+};
 
-// let app: FirebaseApp | undefined;
+let app: FirebaseApp | undefined;
 
-// export function getFirebaseApp(): FirebaseApp {
-//   if (!app) {
-//     app = getApps().length ? getApps()[0] as FirebaseApp : initializeApp(firebaseConfig);
-//   }
-//   return app;
-// }
+export function getFirebaseApp(): FirebaseApp {
+  if (!app) {
+    app = getApps().length ? (getApps()[0] as FirebaseApp) : initializeApp(firebaseConfig);
+  }
+  return app;
+}
 
-// export const auth = () => getAuth(getFirebaseApp());
-// export const db = () => getFirestore(getFirebaseApp());
+export const auth = () => getAuth(getFirebaseApp());
+export const db = () => getFirestore(getFirebaseApp());
 
-export const firebaseReady = false;
+export const firebaseReady = true;
