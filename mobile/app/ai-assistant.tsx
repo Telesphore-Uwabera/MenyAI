@@ -1,25 +1,35 @@
-import { View, Text, ScrollView, TouchableOpacity, TextInput } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, TextInput, ActivityIndicator } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { colors, spacing, fontSize, borderRadius } from "@/theme";
+import { api } from "@/lib/api";
 
-const MOCK_MESSAGES = [
-  { id: "1", type: "ai", text: "Muraho! Ndi MenyAI, umufasha wawe. Ufite ikibazo cyangwa ukenera ubufasha kuri iki gisomo?" },
-  { id: "2", type: "user", text: "Ntibinsobanukiwe neza itandukaniro riri hagati ya \"Gatanu\" na \"Gatandatu\"" },
-  {
-    id: "3",
-    type: "ai",
-    text: "Nzagusobanurira neza!\n\nGatanu = 5\nNi nk'iminwe itanu ku kiganza.\n\nGatandatu = 6\nNi nk'iminwe itanu ku kiganza + ukundi kumwe.\n\nReka tugerageze hamwe: Bara iminwe yawe itanu (Gatanu), hanyuma ongeraho ukundi kumwe (Gatandatu). Urabyumva?",
-  },
-  { id: "4", type: "user", text: "Yego! Murakoze cyane! Ubu ndasobanukiwe" },
-  { id: "5", type: "ai", text: "Nta kibazo! Nishimiye kukubafasha. Wifuza gukomeza isomo cyangwa ufite ikindi kibazo?" },
+const INITIAL_MESSAGES = [
+  { id: "1", type: "ai" as const, text: "Muraho! Ndi MenyAI, umufasha wawe. Ufite ikibazo cyangwa ukenera ubufasha kuri iki gisomo?" },
 ];
+
+const FALLBACK_REPLY = "Ntabwo nashoboye gusubiza ubu. Gerageza none cyangwa injira kugira ngo ube na AI.";
 
 export default function AIAssistantScreen() {
   const router = useRouter();
   const [input, setInput] = useState("");
+  const [messages, setMessages] = useState(INITIAL_MESSAGES);
+  const [loading, setLoading] = useState(false);
+  const scrollRef = useRef<ScrollView>(null);
+
+  const sendMessage = async () => {
+    const text = input.trim();
+    if (!text || loading) return;
+    setInput("");
+    const userMsg = { id: Date.now().toString(), type: "user" as const, text };
+    setMessages((m) => [...m, userMsg]);
+    setLoading(true);
+    const reply = await api.postAiChat(text, null);
+    setMessages((m) => [...m, { id: (Date.now() + 1).toString(), type: "ai" as const, text: reply ?? FALLBACK_REPLY }]);
+    setLoading(false);
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["top"]}>
@@ -70,6 +80,7 @@ export default function AIAssistantScreen() {
       </View>
 
       <ScrollView
+        ref={scrollRef}
         style={{ flex: 1 }}
         contentContainerStyle={{ padding: spacing.md, paddingBottom: 120 }}
         showsVerticalScrollIndicator={false}
@@ -89,7 +100,7 @@ export default function AIAssistantScreen() {
         </View>
 
         {/* Chat messages */}
-        {MOCK_MESSAGES.map((msg) => (
+        {messages.map((msg) => (
           <View
             key={msg.id}
             style={{
@@ -192,6 +203,8 @@ export default function AIAssistantScreen() {
           }}
         />
         <TouchableOpacity
+          onPress={sendMessage}
+          disabled={loading}
           style={{
             width: 44,
             height: 44,
@@ -201,7 +214,11 @@ export default function AIAssistantScreen() {
             justifyContent: "center",
           }}
         >
-          <Ionicons name="arrow-forward" size={20} color="#fff" />
+          {loading ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Ionicons name="arrow-forward" size={20} color="#fff" />
+          )}
         </TouchableOpacity>
       </View>
     </SafeAreaView>

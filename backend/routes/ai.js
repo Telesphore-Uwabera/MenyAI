@@ -1,0 +1,50 @@
+/**
+ * Optional AI tutoring API – controlled access via Express.
+ * Uses OpenAI; requires OPENAI_API_KEY. Call from app only when user asks for help.
+ */
+const express = require("express");
+const OpenAI = require("openai");
+const { verifyIdToken } = require("../config/firebase");
+
+const router = express.Router();
+const openai = process.env.OPENAI_API_KEY
+  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+  : null;
+
+const SYSTEM_PROMPT = `You are MenyAI Umufasha, a friendly tutor for the MenyAI literacy app. 
+You help learners in Kinyarwanda only. Explain simply, use examples (e.g. fingers for numbers), 
+and encourage. Keep answers short and clear.`;
+
+router.post("/chat", async (req, res) => {
+  try {
+    const decoded = await verifyIdToken(req);
+    if (!decoded?.uid) return res.status(401).json({ error: "Unauthorized" });
+    if (!openai) return res.status(503).json({ error: "AI service not configured" });
+
+    const { message, lessonContext } = req.body || {};
+    if (!message || typeof message !== "string") {
+      return res.status(400).json({ error: "message required" });
+    }
+
+    const userContent = lessonContext
+      ? `[Lesson context: ${lessonContext}]\n\nUser question: ${message}`
+      : message;
+
+    const completion = await openai.chat.completions.create({
+      model: process.env.OPENAI_MODEL || "gpt-4o-mini",
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: userContent },
+      ],
+      max_tokens: 500,
+    });
+
+    const reply = completion.choices[0]?.message?.content ?? "Ntabwo nashoboye gusubiza ubu.";
+    res.json({ reply });
+  } catch (e) {
+    console.error("AI chat error:", e.message);
+    res.status(500).json({ error: "AI request failed" });
+  }
+});
+
+module.exports = router;

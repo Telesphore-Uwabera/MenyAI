@@ -2,12 +2,21 @@ import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useEffect, useState } from "react";
 import { colors, spacing, fontSize, borderRadius } from "@/theme";
 import { MOCK_USER, MOCK_PROGRESS } from "@/data/mock";
+import { api } from "@/lib/api";
 
 export default function HomeScreen() {
   const router = useRouter();
   const userName = MOCK_USER.name;
+  const [progress, setProgress] = useState(MOCK_PROGRESS);
+
+  useEffect(() => {
+    api.getProgress(null).then((p) => {
+      if (p) setProgress(p);
+    });
+  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["top"]}>
@@ -106,7 +115,7 @@ export default function HomeScreen() {
             }}
           >
             <Text style={{ fontSize: fontSize["3xl"], fontWeight: "800", color: colors.primary, marginBottom: 4 }}>
-              {MOCK_PROGRESS.completedLessons}
+              {progress.completedLessons}
             </Text>
             <Text style={{ fontSize: fontSize.xs, color: colors.mutedForeground }}>Amasomo Yarangiye</Text>
           </View>
@@ -124,7 +133,7 @@ export default function HomeScreen() {
             }}
           >
             <Text style={{ fontSize: fontSize["3xl"], fontWeight: "800", color: colors.primary, marginBottom: 4 }}>
-              {MOCK_PROGRESS.remainingLessons ?? MOCK_PROGRESS.totalLessons - MOCK_PROGRESS.completedLessons}
+              {progress.remainingLessons ?? progress.totalLessons - progress.completedLessons}
             </Text>
             <Text style={{ fontSize: fontSize.xs, color: colors.mutedForeground }}>Amasomo Asigaye</Text>
           </View>

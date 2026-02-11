@@ -54,6 +54,15 @@ mobile/
 
 All content comes from **`mobile/data/mock.ts`**. Edit it to change what the app shows. When you connect Firebase, replace with Firestore/Auth.
 
+## Deploy backend
+
+After pushing and configuring the code:
+
+1. See **[backend/DEPLOY.md](backend/DEPLOY.md)** for step-by-step deployment (Railway, Render, or Fly.io).
+2. Set env vars on the host: `FIREBASE_SERVICE_ACCOUNT_JSON`, optionally `OPENAI_API_KEY`.
+3. Set **Root Directory** to `backend` so the host builds from the `backend` folder.
+4. Use the deployed URL as **`EXPO_PUBLIC_API_URL`** in the mobile app for production.
+
 ## Firebase
 
 1. Create a project at [Firebase Console](https://console.firebase.google.com).

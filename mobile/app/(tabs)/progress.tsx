@@ -1,12 +1,22 @@
 import { View, Text, ScrollView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useEffect, useState } from "react";
 import { colors, spacing, fontSize, borderRadius } from "@/theme";
 import { MOCK_PROGRESS } from "@/data/mock";
+import { api } from "@/lib/api";
 
 export default function ProgressScreen() {
-  const percent = MOCK_PROGRESS.totalLessons
-    ? Math.round((MOCK_PROGRESS.completedLessons / MOCK_PROGRESS.totalLessons) * 100)
+  const [progress, setProgress] = useState(MOCK_PROGRESS);
+
+  useEffect(() => {
+    api.getProgress(null).then((p) => {
+      if (p) setProgress(p);
+    });
+  }, []);
+
+  const percent = progress.totalLessons
+    ? Math.round((progress.completedLessons / progress.totalLessons) * 100)
     : 0;
 
   return (
@@ -53,7 +63,7 @@ export default function ProgressScreen() {
             />
           </View>
           <Text style={{ fontSize: fontSize.xs, color: colors.mutedForeground, marginTop: spacing.xs }}>
-            {MOCK_PROGRESS.completedLessons} / {MOCK_PROGRESS.totalLessons} amasomo
+            {progress.completedLessons} / {progress.totalLessons} amasomo
           </Text>
         </View>
 
@@ -86,7 +96,7 @@ export default function ProgressScreen() {
             <Ionicons name="flame" size={40} color={colors.primary} />
           </View>
           <Text style={{ fontSize: fontSize.xl, fontWeight: "700", color: colors.foreground }}>
-            Umunsi {MOCK_PROGRESS.streakDays} – streak!
+            Umunsi {progress.streakDays} – streak!
           </Text>
           <Text style={{ fontSize: fontSize.sm, color: colors.mutedForeground, marginTop: spacing.sm, textAlign: "center" }}>
             Komeza kwiga buri munsi kugira ngo ube streak

@@ -2,12 +2,21 @@ import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useEffect, useState } from "react";
 import { colors, spacing, fontSize, borderRadius } from "@/theme";
 import { MOCK_LESSON_LIST } from "@/data/mock";
+import { api, type LessonListItem } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 
 export default function LessonsScreen() {
   const router = useRouter();
+  const [lessons, setLessons] = useState<LessonListItem[]>(MOCK_LESSON_LIST);
+
+  useEffect(() => {
+    api.getLessons(null).then((list) => {
+      if (list.length > 0) setLessons(list);
+    });
+  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["top"]}>
@@ -34,7 +43,7 @@ export default function LessonsScreen() {
           Urwego 1 - Ibanze
         </Text>
 
-        {MOCK_LESSON_LIST.map((lesson) => (
+        {lessons.map((lesson) => (
           <TouchableOpacity
             key={lesson.id}
             onPress={() => lesson.status !== "new" && router.push(`/lesson/${lesson.id}`)}
@@ -60,7 +69,7 @@ export default function LessonsScreen() {
                 justifyContent: "center",
               }}
             >
-              <Ionicons name={lesson.icon} size={48} color={colors.primaryDark} />
+              <Ionicons name={lesson.icon as any} size={48} color={colors.primaryDark} />
             </View>
             <View style={{ padding: spacing.md }}>
               <Text style={{ fontSize: fontSize.base, fontWeight: "700", color: colors.foreground, marginBottom: spacing.sm }}>
