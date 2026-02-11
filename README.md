@@ -58,10 +58,9 @@ All content comes from **`mobile/data/mock.ts`**. Edit it to change what the app
 
 After pushing and configuring the code:
 
-1. See **[backend/DEPLOY.md](backend/DEPLOY.md)** for step-by-step deployment (Railway, Render, or Fly.io).
-2. Set env vars on the host: `FIREBASE_SERVICE_ACCOUNT_JSON`, optionally `OPENAI_API_KEY`.
-3. Set **Root Directory** to `backend` so the host builds from the `backend` folder.
-4. Use the deployed URL as **`EXPO_PUBLIC_API_URL`** in the mobile app for production.
+1. See **[backend/DEPLOY.md](backend/DEPLOY.md)** for step-by-step deployment (Render recommended, or Railway / Fly.io).
+2. Set **Root Directory** to `backend`; set env vars: `FIREBASE_SERVICE_ACCOUNT_JSON`, optionally `OPENAI_API_KEY`.
+3. Use the deployed URL (e.g. `https://menyai-backend.onrender.com`) as **`EXPO_PUBLIC_API_URL`** in the mobile app for production.
 
 ## Firebase
 
