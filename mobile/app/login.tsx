@@ -147,13 +147,23 @@ export default function LoginScreen() {
             justifyContent: "center",
             gap: spacing.sm,
             paddingVertical: spacing.md,
-            backgroundColor: colors.muted,
-            borderRadius: borderRadius.md,
             marginBottom: spacing.md,
           }}
         >
           <Ionicons name="person-add" size={20} color={colors.foreground} />
-          <Text style={{ fontSize: fontSize.sm, color: colors.foreground }}>Ndumva nshya, tangira kwiyandikisha</Text>
+          <Text style={{ fontSize: fontSize.sm, color: colors.foreground }}>Uri mushya? </Text>
+          <View
+            style={{
+              backgroundColor: colors.accentYellow,
+              paddingHorizontal: spacing.sm,
+              paddingVertical: spacing.xs,
+              borderRadius: borderRadius.sm,
+            }}
+          >
+            <Text style={{ fontSize: fontSize.sm, fontWeight: "600", color: colors.foreground }}>
+              Tangira wiyandikisha
+            </Text>
+          </View>
         </TouchableOpacity>
 
         <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
