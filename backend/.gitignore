@@ -3,3 +3,4 @@ node_modules
 *.log
 firebase-env-value.txt
 *-firebase-adminsdk-*.json
+public/admin

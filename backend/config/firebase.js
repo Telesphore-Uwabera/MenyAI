@@ -2,6 +2,8 @@
  * Firebase Admin SDK – used for Firestore and Auth verification.
  * Set GOOGLE_APPLICATION_CREDENTIALS or FIREBASE_SERVICE_ACCOUNT_JSON in .env.
  */
+const path = require("path");
+const fs = require("fs");
 const admin = require("firebase-admin");
 
 let db = null;
@@ -14,24 +16,51 @@ function initFirebase() {
     return { db, auth };
   }
 
-  const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT_JSON
-    ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON)
-    : undefined;
-
-  if (!serviceAccount && !process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+  const raw = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
+  let serviceAccount = undefined;
+  if (raw && raw.trim()) {
+    try {
+      serviceAccount = JSON.parse(raw);
+    } catch (e) {
+      console.error("Invalid FIREBASE_SERVICE_ACCOUNT_JSON (JSON parse failed):", e.message);
+      return { db: null, auth: null };
+    }
+    if (serviceAccount && serviceAccount.type !== "service_account") {
+      console.error("FIREBASE_SERVICE_ACCOUNT_JSON is not a service account (missing type: service_account).");
+      return { db: null, auth: null };
+    }
+  }
+  if (!serviceAccount && process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+    const keyPath = path.isAbsolute(process.env.GOOGLE_APPLICATION_CREDENTIALS)
+      ? process.env.GOOGLE_APPLICATION_CREDENTIALS
+      : path.join(__dirname, "..", process.env.GOOGLE_APPLICATION_CREDENTIALS);
+    if (fs.existsSync(keyPath)) {
+      try {
+        serviceAccount = JSON.parse(fs.readFileSync(keyPath, "utf8"));
+      } catch (e) {
+        console.error("Failed to read GOOGLE_APPLICATION_CREDENTIALS file:", e.message);
+        return { db: null, auth: null };
+      }
+    } else {
+      console.error("GOOGLE_APPLICATION_CREDENTIALS file not found:", keyPath);
+      return { db: null, auth: null };
+    }
+  }
+  if (!serviceAccount) {
     console.warn("Firebase not configured. Set FIREBASE_SERVICE_ACCOUNT_JSON or GOOGLE_APPLICATION_CREDENTIALS.");
     return { db: null, auth: null };
   }
 
-  admin.initializeApp(
-    serviceAccount
-      ? { credential: admin.credential.cert(serviceAccount) }
-      : { credential: admin.credential.applicationDefault() }
-  );
-
-  db = admin.firestore();
-  auth = admin.auth();
-  return { db, auth };
+  try {
+    admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+    db = admin.firestore();
+    auth = admin.auth();
+    console.log("Firebase initialized (project_id: " + (serviceAccount?.project_id || "default") + ")");
+    return { db, auth };
+  } catch (e) {
+    console.error("Firebase initializeApp failed:", e.message);
+    return { db: null, auth: null };
+  }
 }
 
 function getDb() {
