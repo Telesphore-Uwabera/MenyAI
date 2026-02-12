@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { setAdminKey, clearAdminKey, setApiBase, getApiBase, api } from "../lib/api";
+import { setAdminKey, clearAdminKey, api } from "../lib/api";
 
 const MOCK_USERNAME = "Admin";
 const MOCK_PASSWORD = "123";
@@ -10,12 +10,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [apiUrl, setApiUrl] = useState(getApiBase());
   const navigate = useNavigate();
-
-  const saveApiUrl = () => {
-    setApiBase(apiUrl.trim());
-  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,7 +27,7 @@ export default function Login() {
         await api<{ totalLessons: number }>("/api/admin/stats");
         navigate("/", { replace: true });
       } catch {
-        setError("Backend not reachable. Set Backend URL in Settings after login, or start the backend (port 4000).");
+        setError("Backend not reachable. Check Settings for Backend URL.");
         clearAdminKey();
       } finally {
         setLoading(false);
@@ -59,17 +54,6 @@ export default function Login() {
         <p className="admin-login-subtitle">
           Username and password (mock: Admin / 123).
         </p>
-        <div className="admin-form-group">
-          <label className="admin-form-label">Backend URL (optional)</label>
-          <input
-            type="url"
-            className="admin-input"
-            value={apiUrl}
-            onChange={(e) => setApiUrl(e.target.value)}
-            onBlur={saveApiUrl}
-            placeholder="http://localhost:4000"
-          />
-        </div>
         <div className="admin-form-group">
           <input
             type="text"
