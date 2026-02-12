@@ -173,3 +173,23 @@ fly deploy
 
 - **Build:** `cd admin-panel && pnpm build`. Set `VITE_API_URL` for baked-in backend URL or configure in Settings at runtime.
 - **Serve from backend:** `pnpm build -- --base=/admin/` then copy `dist/` contents to **backend/public/admin**. Backend serves admin at `http://localhost:4000/admin/`.
+
+### Deploy admin panel to Netlify
+
+1. **Connect repo**  
+   [app.netlify.com](https://app.netlify.com) → **Add new site** → **Import an existing project** → choose Git provider and the **MenyAI** repo.
+
+2. **Build settings**  
+   - **Base directory:** `admin-panel`  
+   - **Build command:** `pnpm build` (from `netlify.toml`; Netlify uses pnpm if it sees `pnpm-lock.yaml`)  
+   - **Publish directory:** `admin-panel/dist` (or leave empty; `netlify.toml` sets `publish = "dist"` relative to base)
+
+3. **Environment variables**  
+   In **Site settings** → **Environment variables** → **Add variable** (or **Add single variable**):  
+   - **Key:** `VITE_API_URL`  
+   - **Value:** your backend URL (e.g. `https://menyai-nslw.onrender.com`)  
+   - **Scopes:** All (or only Production).  
+   Redeploy after adding so the value is baked into the build.
+
+4. **Deploy**  
+   Trigger a deploy (e.g. **Trigger deploy** → **Deploy site**). The admin panel will be available at your Netlify URL (e.g. `https://your-site.netlify.app`). Log in with **Admin** / **123** or your `ADMIN_SECRET`; Backend URL can stay empty if `VITE_API_URL` is set.
