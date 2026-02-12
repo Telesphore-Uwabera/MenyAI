@@ -57,9 +57,10 @@ export default function Lessons() {
 
   const saveEdit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!(modal && "id" in modal) || !form.title.trim()) return;
+    if (typeof modal !== "object" || modal === null || !form.title.trim()) return;
+    const lessonId = modal.id;
     try {
-      await api(`/api/admin/lessons/${modal.id}`, {
+      await api(`/api/admin/lessons/${lessonId}`, {
         method: "PUT",
         body: JSON.stringify({
           title: form.title.trim(),
