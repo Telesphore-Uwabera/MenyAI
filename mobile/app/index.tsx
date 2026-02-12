@@ -1,10 +1,18 @@
+import { useEffect } from "react";
 import { Redirect } from "expo-router";
 import { View, ActivityIndicator, StyleSheet } from "react-native";
+import * as SplashScreen from "expo-splash-screen";
 import { useAuth } from "@/lib/auth-context";
 import { colors } from "@/theme";
 
 export default function Index() {
   const { user, loading } = useAuth();
+
+  useEffect(() => {
+    if (!loading) {
+      SplashScreen.hideAsync();
+    }
+  }, [loading]);
 
   if (loading) {
     return (
