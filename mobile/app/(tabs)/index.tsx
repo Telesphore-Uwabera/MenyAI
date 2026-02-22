@@ -4,17 +4,24 @@ import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useEffect, useState } from "react";
 import { colors, spacing, fontSize, borderRadius } from "@/theme";
-import { MOCK_USER, MOCK_PROGRESS } from "@/data/mock";
+import { MOCK_PROGRESS } from "@/data/mock";
+import { useAuth } from "@/lib/auth-context";
 import { api } from "@/lib/api";
 
 export default function HomeScreen() {
   const router = useRouter();
-  const userName = MOCK_USER.name;
-  const [progress, setProgress] = useState(MOCK_PROGRESS);
+  const { user } = useAuth();
+  const userName = user?.displayName?.trim() || "";
+  const [progress, setProgress] = useState({ completedLessons: 0, totalLessons: 45, streakDays: 0, remainingLessons: 45 });
 
   useEffect(() => {
     api.getProgress(null).then((p) => {
-      if (p) setProgress(p);
+      if (p) setProgress({
+        completedLessons: p.completedLessons,
+        totalLessons: p.totalLessons,
+        streakDays: p.streakDays,
+        remainingLessons: p.remainingLessons ?? (p.totalLessons - p.completedLessons)
+      });
     });
   }, []);
 
@@ -39,7 +46,7 @@ export default function HomeScreen() {
         >
           <View>
             <Text style={{ fontSize: fontSize["2xl"], fontWeight: "700", color: colors.foreground }}>
-              Muraho, {userName}!
+              Muraho{userName ? `, ${userName}` : ""}!
             </Text>
             <Text style={{ fontSize: fontSize.sm, color: colors.mutedForeground, marginTop: 2 }}>
               Komeza kwiga neza
@@ -56,7 +63,9 @@ export default function HomeScreen() {
               justifyContent: "center",
             }}
           >
-            <Text style={{ fontSize: 18, fontWeight: "700", color: "#fff" }}>A</Text>
+            <Text style={{ fontSize: 18, fontWeight: "700", color: "#fff" }}>
+              {userName ? userName.charAt(0).toUpperCase() : "?"}
+            </Text>
           </TouchableOpacity>
         </View>
 

@@ -1,5 +1,5 @@
 import { View, Text, ScrollView, TouchableOpacity, Alert } from "react-native";
-import { useRouter, Redirect } from "expo-router";
+import { useRouter, Redirect, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors, spacing, fontSize, borderRadius } from "@/theme";
@@ -10,6 +10,7 @@ import { useState } from "react";
 
 export default function LoginScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams<{ registered?: string }>();
   const { user, login, error, clearError, loading: authLoading } = useAuth();
   const [phone, setPhone] = useState("");
   const [pin, setPin] = useState("");
@@ -29,7 +30,7 @@ export default function LoginScreen() {
     clearError();
     try {
       await login(trimmedPhone, pin);
-      router.replace("/(tabs)");
+      Alert.alert("Neza!", "Winjiye neza!", [{ text: "OK", onPress: () => router.replace("/(tabs)") }]);
     } catch {
       // error shown via useAuth().error
     } finally {
@@ -125,6 +126,11 @@ export default function LoginScreen() {
           containerStyle={{ marginBottom: spacing.lg }}
         />
 
+        {params?.registered === "1" ? (
+          <Text style={{ fontSize: fontSize.sm, color: colors.primary, marginBottom: spacing.md }}>
+            Wiyandikishije neza. Injira ubu.
+          </Text>
+        ) : null}
         {error ? (
           <Text style={{ fontSize: fontSize.sm, color: colors.warning, marginBottom: spacing.md }}>
             {error}
@@ -135,8 +141,9 @@ export default function LoginScreen() {
           title="Injira"
           onPress={handleLogin}
           loading={loading}
-          icon={<Ionicons name="chevron-forward" size={20} color={colors.primaryForeground} />}
-          style={{ marginBottom: spacing.md }}
+          icon={<Ionicons name="chevron-forward" size={20} color={colors.foreground} />}
+          style={{ marginBottom: spacing.md, backgroundColor: colors.accentYellow }}
+          textStyle={{ color: colors.foreground }}
         />
 
         <TouchableOpacity

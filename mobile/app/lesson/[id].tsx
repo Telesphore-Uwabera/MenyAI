@@ -1,198 +1,208 @@
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, TextInput, Alert, ActivityIndicator } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { colors, spacing, fontSize, borderRadius } from "@/theme";
-import { MOCK_LESSON_QUIZ, MOCK_LESSON_LIST } from "@/data/mock";
+import { api } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
+import YoutubePlayer from "react-native-youtube-iframe";
+import { Audio } from "expo-av";
 
 export default function ActiveLessonScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const [selectedOption, setSelectedOption] = useState<string | null>(null);
-  const lesson = MOCK_LESSON_LIST.find((l) => l.id === id) ?? MOCK_LESSON_LIST[0];
-  const quiz = MOCK_LESSON_QUIZ;
+  const [loading, setLoading] = useState(true);
+  const [lesson, setLesson] = useState<any>(null);
+  const [currentStep, setCurrentStep] = useState(0); // 0 = Video, 1+ = Activities
+  const [answers, setAnswers] = useState<any[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [score, setScore] = useState<{ score: number; passed: boolean } | null>(null);
+
+  // Audio recording state
+  const [recording, setRecording] = useState<Audio.Recording | null>(null);
+
+  useEffect(() => {
+    const fetchLesson = async () => {
+      try {
+        const res = await fetch(`${api.getBaseUrl()}/api/lessons/${id}`);
+        const data = await res.json();
+        setLesson(data);
+        setAnswers(new Array((data.activities || []).length).fill(""));
+      } catch (err) {
+        Alert.alert("Error", "Failed to load lesson");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchLesson();
+  }, [id]);
+
+  const handleNext = () => {
+    if (currentStep < (lesson?.activities?.length || 0)) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      handleSubmit();
+    }
+  };
+
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    try {
+      const res = await api.submitLesson(id!, answers);
+      setScore(res);
+    } catch (err) {
+      Alert.alert("Error", "Failed to submit answers");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const startRecording = async () => {
+    try {
+      await Audio.requestPermissionsAsync();
+      await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
+      const { recording } = await Audio.Recording.createAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
+      setRecording(recording);
+    } catch (err) {
+      Alert.alert("Error", "Failed to start recording");
+    }
+  };
+
+  const stopRecording = async (index: number) => {
+    setRecording(null);
+    await recording?.stopAndUnloadAsync();
+    const uri = recording?.getURI();
+    const newAnswers = [...answers];
+    newAnswers[index] = uri; // In real app, upload this to storage
+    setAnswers(newAnswers);
+  };
+
+  if (loading) return <View style={{ flex: 1, justifyContent: "center" }}><ActivityIndicator size="large" color={colors.primary} /></View>;
+  if (!lesson) return <View style={{ flex: 1, justifyContent: "center" }}><Text>Lesson not found</Text></View>;
+
+  if (score) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background, padding: spacing.xl, justifyContent: "center", alignItems: "center" }}>
+        <Ionicons name={score.passed ? "checkmark-circle" : "close-circle"} size={80} color={score.passed ? colors.success : colors.danger} />
+        <Text style={{ fontSize: fontSize["3xl"], fontWeight: "800", marginTop: spacing.md }}>{score.score}%</Text>
+        <Text style={{ fontSize: fontSize.lg, color: colors.mutedForeground, textAlign: "center", marginVertical: spacing.lg }}>
+          {score.passed ? "Mwarangije isomo neza! Urwego rwanyu rwiyongereye." : "Ntabwo mwashoboye gutsinda isomo. Mukomerezeho mwongere mugerageze."}
+        </Text>
+        <Button
+          title={score.passed ? "Subira ku Meza" : "Ongera Ugerageze"}
+          onPress={() => score.passed ? router.replace("/(tabs)/lessons") : setScore(null)}
+          variant="primary"
+          style={{ width: "100%" }}
+        />
+      </SafeAreaView>
+    );
+  }
+
+  const activities = lesson.activities || [];
+  const isVideoStep = currentStep === 0;
+  const currentActivity = isVideoStep ? null : activities[currentStep - 1];
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["top"]}>
-      {/* Top Bar - Back + Title + Progress */}
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          paddingHorizontal: spacing.md,
-          paddingVertical: spacing.md,
-          borderBottomWidth: 1,
-          borderBottomColor: colors.border,
-        }}
-      >
-        <TouchableOpacity onPress={() => router.back()} style={{ marginRight: spacing.md, padding: spacing.sm }}>
-          <Ionicons name="arrow-back" size={24} color={colors.foreground} />
-        </TouchableOpacity>
-        <View style={{ flex: 1 }}>
-          <Text style={{ fontSize: fontSize.lg, fontWeight: "700", color: colors.foreground }}>
-            {lesson.title}
-          </Text>
-          <Text style={{ fontSize: fontSize.sm, color: colors.mutedForeground }}>Igice 3/8</Text>
-        </View>
+      <View style={{ flexDirection: "row", alignItems: "center", padding: spacing.md, borderBottomWidth: 1, borderBottomColor: colors.border }}>
+        <TouchableOpacity onPress={() => router.back()} style={{ marginRight: spacing.md }}><Ionicons name="arrow-back" size={24} /></TouchableOpacity>
+        <Text style={{ fontSize: fontSize.lg, fontWeight: "700" }}>{lesson.title}</Text>
       </View>
 
-      <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={{ padding: spacing.md, paddingBottom: 120 }}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Progress bar */}
-        <View style={{ height: 6, backgroundColor: colors.muted, borderRadius: 3, marginBottom: spacing.lg, overflow: "hidden" }}>
-          <View
-            style={{
-              width: "37%",
-              height: "100%",
-              backgroundColor: colors.primary,
-              borderRadius: 3,
-            }}
-          />
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: spacing.md }}>
+        {/* Progress Bar */}
+        <View style={{ height: 6, backgroundColor: colors.muted, borderRadius: 3, marginBottom: spacing.lg }}>
+          <View style={{ width: `${(currentStep / (activities.length + 1)) * 100}%`, height: "100%", backgroundColor: colors.primary, borderRadius: 3 }} />
         </View>
 
-        {/* Audio Player */}
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            backgroundColor: colors.accentYellow,
-            padding: spacing.md,
-            borderRadius: borderRadius.md,
-            marginBottom: spacing.lg,
-          }}
-        >
-          <TouchableOpacity
-            style={{
-              width: 48,
-              height: 48,
-              borderRadius: 24,
-              backgroundColor: colors.primary,
-              alignItems: "center",
-              justifyContent: "center",
-              marginRight: spacing.md,
-            }}
-          >
-            <Ionicons name="play" size={24} color="#fff" />
-          </TouchableOpacity>
-          <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: fontSize.sm, fontWeight: "600", color: colors.foreground }}>
-              Umva ijwi ryerekana imibare
-            </Text>
-            <Text style={{ fontSize: fontSize.xs, color: colors.mutedForeground }}>0:45 / 2:30</Text>
+        {isVideoStep ? (
+          <View>
+            <Text style={{ fontSize: fontSize.xl, fontWeight: "700", marginBottom: spacing.md }}>Iga Gusoma no Kwandika</Text>
+            {lesson.videoUrl ? (
+              <YoutubePlayer height={220} videoId={lesson.videoUrl.split("v=")[1]?.split("&")[0] || lesson.videoUrl.split("/").pop()} />
+            ) : (
+              <View style={{ height: 200, backgroundColor: colors.muted, justifyContent: "center", alignItems: "center" }}>
+                <Text>No video available</Text>
+              </View>
+            )}
+            <Text style={{ marginTop: spacing.lg, color: colors.mutedForeground, lineHeight: 24 }}>{lesson.description}</Text>
           </View>
-        </View>
+        ) : (
+          <View>
+            <Text style={{ fontSize: fontSize.lg, fontWeight: "700", marginBottom: spacing.lg }}>{currentActivity.prompt}</Text>
 
-        {/* Visual content - Big 5 + Gatanu */}
-        <View
-          style={{
-            backgroundColor: colors.accentYellow,
-            minHeight: 200,
-            borderRadius: borderRadius.lg,
-            alignItems: "center",
-            justifyContent: "center",
-            padding: spacing.xl,
-            marginBottom: spacing.lg,
-          }}
-        >
-          <Text style={{ fontSize: 72, fontWeight: "800", color: colors.primaryDark }}>{quiz.visual.value}</Text>
-          <Text style={{ fontSize: fontSize["2xl"], fontWeight: "700", color: colors.foreground, marginTop: spacing.sm }}>
-            {quiz.visual.label}
-          </Text>
-        </View>
+            {currentActivity.type === "typing" && (
+              <TextInput
+                style={{ borderWidth: 2, borderColor: colors.primary, borderRadius: borderRadius.md, padding: spacing.md, fontSize: fontSize.lg }}
+                value={answers[currentStep - 1]}
+                onChangeText={(text) => {
+                  const newAnswers = [...answers];
+                  newAnswers[currentStep - 1] = text;
+                  setAnswers(newAnswers);
+                }}
+                autoFocus
+                placeholder="Andika hano..."
+              />
+            )}
 
-        {/* Hitamo igisubizo cyiza */}
-        <Text style={{ fontSize: fontSize.lg, fontWeight: "700", color: colors.foreground, marginBottom: spacing.md }}>
-          {quiz.question}
-        </Text>
+            {currentActivity.type === "mc" && (
+              <View style={{ gap: spacing.sm }}>
+                {(currentActivity.options || []).map((opt: string) => (
+                  <TouchableOpacity
+                    key={opt}
+                    onPress={() => {
+                      const newAnswers = [...answers];
+                      newAnswers[currentStep - 1] = opt;
+                      setAnswers(newAnswers);
+                    }}
+                    style={{
+                      padding: spacing.lg,
+                      borderRadius: borderRadius.md,
+                      borderWidth: 2,
+                      borderColor: answers[currentStep - 1] === opt ? colors.primary : colors.border,
+                      backgroundColor: colors.card
+                    }}
+                  >
+                    <Text style={{ fontWeight: "600" }}>{opt}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
 
-        {quiz.options.map((opt) => (
-          <TouchableOpacity
-            key={opt.key}
-            onPress={() => setSelectedOption(opt.key)}
-            style={{
-              backgroundColor: colors.card,
-              borderRadius: borderRadius.md,
-              padding: spacing.lg,
-              marginBottom: spacing.sm,
-              borderWidth: 3,
-              borderColor: selectedOption === opt.key ? colors.primary : "transparent",
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.08,
-              shadowRadius: 8,
-              elevation: 2,
-            }}
-          >
-            <Text style={{ fontSize: fontSize.base, fontWeight: "600", color: colors.foreground }}>
-              {opt.key}. {opt.text}
-            </Text>
-          </TouchableOpacity>
-        ))}
-
-        {/* AI Help Button */}
-        <TouchableOpacity
-          onPress={() => router.push("/ai-assistant")}
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: spacing.sm,
-            backgroundColor: colors.aiPurpleStart,
-            paddingVertical: spacing.md,
-            borderRadius: borderRadius.md,
-            marginTop: spacing.lg,
-          }}
-        >
-          <Ionicons name="chatbubble-ellipses" size={20} color="#fff" />
-          <Text style={{ fontSize: fontSize.sm, fontWeight: "600", color: "#fff" }}>
-            Baza AI Niba Ufite Ikibazo
-          </Text>
-        </TouchableOpacity>
-
-        {/* Prev / Next buttons */}
-        <View style={{ flexDirection: "row", gap: spacing.md, marginTop: spacing.lg }}>
-          <TouchableOpacity
-            onPress={() => router.back()}
-            style={{
-              flex: 1,
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: spacing.sm,
-              paddingVertical: spacing.md,
-              borderRadius: borderRadius.md,
-              borderWidth: 2,
-              borderColor: colors.primary,
-            }}
-          >
-            <Ionicons name="arrow-back" size={18} color={colors.primary} />
-            <Text style={{ fontSize: fontSize.base, fontWeight: "600", color: colors.primary }}>
-              Ibanze
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {}}
-            style={{
-              flex: 1,
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: spacing.sm,
-              paddingVertical: spacing.md,
-              borderRadius: borderRadius.md,
-              backgroundColor: colors.primary,
-            }}
-          >
-            <Text style={{ fontSize: fontSize.base, fontWeight: "600", color: "#fff" }}>Komeza</Text>
-            <Ionicons name="arrow-forward" size={18} color="#fff" />
-          </TouchableOpacity>
-        </View>
+            {currentActivity.type === "audio" && (
+              <View style={{ alignItems: "center", padding: spacing.xl }}>
+                <TouchableOpacity
+                  onPressIn={startRecording}
+                  onPressOut={() => stopRecording(currentStep - 1)}
+                  style={{
+                    width: 100,
+                    height: 100,
+                    borderRadius: 50,
+                    backgroundColor: recording ? colors.danger : colors.primary,
+                    justifyContent: "center",
+                    alignItems: "center"
+                  }}
+                >
+                  <Ionicons name={recording ? "mic" : "mic-outline"} size={40} color="#fff" />
+                </TouchableOpacity>
+                <Text style={{ marginTop: spacing.md, color: colors.mutedForeground }}>
+                  {recording ? "Kurura ukura uruhushya..." : "Kanda hano ufate amajwi"}
+                </Text>
+              </View>
+            )}
+          </View>
+        )}
       </ScrollView>
+
+      <View style={{ padding: spacing.md, borderTopWidth: 1, borderTopColor: colors.border }}>
+        <Button
+          title={isVideoStep ? "Tangira Imyitozo" : (currentStep === activities.length ? "Ohereza" : "Komeza")}
+          onPress={handleNext}
+          disabled={!isVideoStep && !answers[currentStep - 1] && currentActivity.type !== "audio"}
+          loading={isSubmitting}
+        />
+      </View>
     </SafeAreaView>
   );
 }

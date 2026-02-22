@@ -129,6 +129,34 @@ export const api = {
     }
   },
 
+  async submitLesson(lessonId: string, answers: any[], token?: string | null): Promise<{ score: number; passed: boolean } | null> {
+    try {
+      const res = await fetch(`${BASE_URL}/api/progress/submit`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ lessonId, answers }),
+      });
+      if (!res.ok) return null;
+      return await res.json();
+    } catch {
+      return null;
+    }
+  },
+
+  async getPractice(): Promise<any[]> {
+    try {
+      const res = await fetch(`${BASE_URL}/api/practice`);
+      if (!res.ok) return [];
+      const data = await res.json();
+      return data.practiceItems || [];
+    } catch {
+      return [];
+    }
+  },
+
   async healthCheck(): Promise<boolean> {
     try {
       const res = await fetch(`${BASE_URL}/health`);

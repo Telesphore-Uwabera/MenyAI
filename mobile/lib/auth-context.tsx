@@ -122,7 +122,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (name.trim()) {
         await updateProfile(newUser, { displayName: name.trim() });
       }
-      await setLastLogin();
+      await firebaseSignOut(auth());
     } catch (e: unknown) {
       const message = e && typeof e === "object" && "code" in e
         ? (e as { code: string }).code === "auth/email-already-in-use"

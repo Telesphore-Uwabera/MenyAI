@@ -65,6 +65,10 @@ export async function api<T>(path: string, options?: RequestInit): Promise<T> {
 }
 
 export type Stats = { totalLessons: number; totalUsers: number; totalProgressDocs: number };
-export type Lesson = { id: string; title: string; duration?: string; level?: string; order?: number; description?: string };
-export type User = { uid: string; email: string | null; displayName: string | null; createdAt: string };
+export type Lesson = { id: string; title: string; duration?: string; level?: string; order?: number; description?: string; difficulty?: string; enabled?: boolean; videoUrl?: string; activities?: any[] };
+export type User = { uid: string; email: string | null; displayName: string | null; createdAt: string; disabled?: boolean; profile?: UserProfile | null };
+export type UserProfile = { name?: string; age?: number; sector?: string; contact?: string; enrollmentDate?: string; literacyScore?: number; active?: boolean; updatedAt?: string };
 export type Progress = { uid: string; completedLessons?: number; streakDays?: number; updatedAt?: string };
+export type Analytics = { totalUsers: number; activeUsers: number; totalLessonsCompleted: number; lessonsCompletedToday: number; lessonsCompletedThisWeek: number; totalAIConversations: number; uniqueAIVisitors: number; aiUsagePercent: number; avgProgressPercent: number };
+export type AILog = { id: string; uid: string; message: string; reply?: string; lessonContext?: string; createdAt: string };
+export type AIStats = { learnersUsingAI: number; learnersIndependent: number; totalActivations: number; avgConversationLength: number; topUsersByAIActivations: { uid: string; count: number }[] };

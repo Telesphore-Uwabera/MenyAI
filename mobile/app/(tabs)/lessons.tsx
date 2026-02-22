@@ -10,11 +10,13 @@ import { Button } from "@/components/ui/Button";
 
 export default function LessonsScreen() {
   const router = useRouter();
-  const [lessons, setLessons] = useState<LessonListItem[]>(MOCK_LESSON_LIST);
+  const [lessons, setLessons] = useState<LessonListItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     api.getLessons(null).then((list) => {
-      if (list.length > 0) setLessons(list);
+      setLessons(list);
+      setLoading(false);
     });
   }, []);
 
@@ -43,112 +45,125 @@ export default function LessonsScreen() {
           Urwego 1 - Ibanze
         </Text>
 
-        {lessons.map((lesson) => (
-          <TouchableOpacity
-            key={lesson.id}
-            onPress={() => lesson.status !== "new" && router.push(`/lesson/${lesson.id}`)}
-            activeOpacity={0.9}
-            style={{
-              backgroundColor: colors.card,
-              borderRadius: borderRadius.lg,
-              overflow: "hidden",
-              marginBottom: spacing.md,
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.08,
-              shadowRadius: 8,
-              elevation: 2,
-            }}
-          >
-            {/* Lesson image area */}
-            <View
+        {loading ? (
+          <View style={{ padding: spacing.xl, alignItems: "center" }}>
+            <Text style={{ color: colors.mutedForeground }}>Loading lessons...</Text>
+          </View>
+        ) : lessons.length === 0 ? (
+          <View style={{ padding: spacing.xl, alignItems: "center" }}>
+            <Ionicons name="documents-outline" size={48} color={colors.mutedForeground} />
+            <Text style={{ color: colors.mutedForeground, marginTop: spacing.md, fontSize: fontSize.base }}>
+              Nta masomo araboneka.
+            </Text>
+          </View>
+        ) : (
+          lessons.map((lesson) => (
+            <TouchableOpacity
+              key={lesson.id}
+              onPress={() => lesson.status !== "new" && router.push(`/lesson/${lesson.id}`)}
+              activeOpacity={0.9}
               style={{
-                height: 140,
-                backgroundColor: lesson.gradient?.[0] ?? colors.primaryMuted,
-                alignItems: "center",
-                justifyContent: "center",
+                backgroundColor: colors.card,
+                borderRadius: borderRadius.lg,
+                overflow: "hidden",
+                marginBottom: spacing.md,
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.08,
+                shadowRadius: 8,
+                elevation: 2,
               }}
             >
-              <Ionicons name={lesson.icon as any} size={48} color={colors.primaryDark} />
-            </View>
-            <View style={{ padding: spacing.md }}>
-              <Text style={{ fontSize: fontSize.base, fontWeight: "700", color: colors.foreground, marginBottom: spacing.sm }}>
-                {lesson.title}
-              </Text>
-              <View style={{ flexDirection: "row", gap: spacing.md, marginBottom: spacing.sm }}>
-                <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-                  <Ionicons name="time-outline" size={14} color={colors.mutedForeground} />
-                  <Text style={{ fontSize: fontSize.xs, color: colors.mutedForeground }}>{lesson.duration}</Text>
-                </View>
-                <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-                  <Ionicons name="volume-high" size={14} color={colors.mutedForeground} />
-                  <Text style={{ fontSize: fontSize.xs, color: colors.mutedForeground }}>{lesson.meta}</Text>
-                </View>
+              {/* Lesson image area */}
+              <View
+                style={{
+                  height: 140,
+                  backgroundColor: lesson.gradient?.[0] ?? colors.primaryMuted,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Ionicons name={lesson.icon as any} size={48} color={colors.primaryDark} />
               </View>
-
-              {lesson.status === "completed" && (
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: 4,
-                    backgroundColor: colors.primaryMuted,
-                    paddingVertical: 4,
-                    paddingHorizontal: 12,
-                    borderRadius: 12,
-                    alignSelf: "flex-start",
-                  }}
-                >
-                  <Ionicons name="checkmark-circle" size={16} color={colors.success} />
-                  <Text style={{ fontSize: fontSize.xs, fontWeight: "600", color: colors.success }}>
-                    Yararangiye
-                  </Text>
-                </View>
-              )}
-
-              {lesson.status === "progress" && (
-                <>
-                  <View style={{ height: 6, backgroundColor: colors.muted, borderRadius: 3, marginBottom: spacing.xs, overflow: "hidden" }}>
-                    <View
-                      style={{
-                        width: `${lesson.progress}%`,
-                        height: "100%",
-                        backgroundColor: colors.primary,
-                        borderRadius: 3,
-                      }}
-                    />
+              <View style={{ padding: spacing.md }}>
+                <Text style={{ fontSize: fontSize.base, fontWeight: "700", color: colors.foreground, marginBottom: spacing.sm }}>
+                  {lesson.title}
+                </Text>
+                <View style={{ flexDirection: "row", gap: spacing.md, marginBottom: spacing.sm }}>
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+                    <Ionicons name="time-outline" size={14} color={colors.mutedForeground} />
+                    <Text style={{ fontSize: fontSize.xs, color: colors.mutedForeground }}>{lesson.duration}</Text>
                   </View>
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+                    <Ionicons name="volume-high" size={14} color={colors.mutedForeground} />
+                    <Text style={{ fontSize: fontSize.xs, color: colors.mutedForeground }}>{lesson.meta}</Text>
+                  </View>
+                </View>
+
+                {lesson.status === "completed" && (
                   <View
                     style={{
                       flexDirection: "row",
                       alignItems: "center",
                       gap: 4,
-                      backgroundColor: colors.warningBg,
+                      backgroundColor: colors.primaryMuted,
                       paddingVertical: 4,
                       paddingHorizontal: 12,
                       borderRadius: 12,
                       alignSelf: "flex-start",
                     }}
                   >
-                    <Ionicons name="hourglass-outline" size={16} color={colors.warning} />
-                    <Text style={{ fontSize: fontSize.xs, fontWeight: "600", color: colors.warning }}>
-                      Urikuri
+                    <Ionicons name="checkmark-circle" size={16} color={colors.success} />
+                    <Text style={{ fontSize: fontSize.xs, fontWeight: "600", color: colors.success }}>
+                      Yararangiye
                     </Text>
                   </View>
-                </>
-              )}
+                )}
 
-              {lesson.status === "new" && (
-                <Button
-                  title="Tangira Isomo"
-                  onPress={() => router.push(`/lesson/${lesson.id}`)}
-                  variant="primary"
-                  style={{ marginTop: spacing.sm }}
-                />
-              )}
-            </View>
-          </TouchableOpacity>
-        ))}
+                {lesson.status === "progress" && (
+                  <>
+                    <View style={{ height: 6, backgroundColor: colors.muted, borderRadius: 3, marginBottom: spacing.xs, overflow: "hidden" }}>
+                      <View
+                        style={{
+                          width: `${lesson.progress}%`,
+                          height: "100%",
+                          backgroundColor: colors.primary,
+                          borderRadius: 3,
+                        }}
+                      />
+                    </View>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 4,
+                        backgroundColor: colors.warningBg,
+                        paddingVertical: 4,
+                        paddingHorizontal: 12,
+                        borderRadius: 12,
+                        alignSelf: "flex-start",
+                      }}
+                    >
+                      <Ionicons name="hourglass-outline" size={16} color={colors.warning} />
+                      <Text style={{ fontSize: fontSize.xs, fontWeight: "600", color: colors.warning }}>
+                        Urikuri
+                      </Text>
+                    </View>
+                  </>
+                )}
+
+                {lesson.status === "new" && (
+                  <Button
+                    title="Tangira Isomo"
+                    onPress={() => router.push(`/lesson/${lesson.id}`)}
+                    variant="primary"
+                    style={{ marginTop: spacing.sm }}
+                  />
+                )}
+              </View>
+            </TouchableOpacity>
+          ))
+        )}
       </ScrollView>
     </SafeAreaView>
   );

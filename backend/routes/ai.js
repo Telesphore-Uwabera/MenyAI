@@ -1,10 +1,10 @@
 /**
  * Optional AI tutoring API – controlled access via Express.
- * Uses OpenAI; requires OPENAI_API_KEY. Call from app only when user asks for help.
+ * Uses OpenAI; requires OPENAI_API_KEY. Logs each chat to Firestore for admin monitoring.
  */
 const express = require("express");
 const OpenAI = require("openai");
-const { verifyIdToken } = require("../config/firebase");
+const { verifyIdToken, getDb } = require("../config/firebase");
 
 const router = express.Router();
 const openai = process.env.OPENAI_API_KEY
@@ -40,6 +40,23 @@ router.post("/chat", async (req, res) => {
     });
 
     const reply = completion.choices[0]?.message?.content ?? "Ntabwo nashoboye gusubiza ubu.";
+    const uid = decoded.uid;
+
+    const db = getDb();
+    if (db) {
+      try {
+        await db.collection("aiChatLogs").add({
+          uid,
+          message: String(message).slice(0, 2000),
+          reply: String(reply).slice(0, 2000),
+          lessonContext: lessonContext != null ? String(lessonContext).slice(0, 500) : null,
+          createdAt: new Date().toISOString(),
+        });
+      } catch (logErr) {
+        console.error("AI log write failed:", logErr.message);
+      }
+    }
+
     res.json({ reply });
   } catch (e) {
     console.error("AI chat error:", e.message);

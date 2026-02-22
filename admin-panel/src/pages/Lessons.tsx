@@ -6,7 +6,7 @@ export default function Lessons() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState<"add" | Lesson | null>(null);
-  const [form, setForm] = useState({ title: "", duration: "", level: "", order: 0, description: "" });
+  const [form, setForm] = useState({ title: "", duration: "", level: "", order: 0, description: "", difficulty: "", enabled: true, videoUrl: "", activities: [] as any[] });
 
   const load = () => {
     setLoading(true);
@@ -19,7 +19,7 @@ export default function Lessons() {
   useEffect(() => load(), []);
 
   const openAdd = () => {
-    setForm({ title: "", duration: "", level: "", order: lessons.length, description: "" });
+    setForm({ title: "", duration: "", level: "", order: lessons.length, description: "", difficulty: "", enabled: true, videoUrl: "", activities: [] });
     setModal("add");
   };
   const openEdit = (l: Lesson) => {
@@ -29,6 +29,10 @@ export default function Lessons() {
       level: l.level ?? "",
       order: l.order ?? 0,
       description: (l as { description?: string }).description ?? "",
+      difficulty: (l as { difficulty?: string }).difficulty ?? "",
+      enabled: (l as { enabled?: boolean }).enabled !== false,
+      videoUrl: (l as any).videoUrl ?? "",
+      activities: (l as any).activities ?? [],
     });
     setModal(l);
   };
@@ -46,6 +50,10 @@ export default function Lessons() {
           level: form.level.trim() || undefined,
           order: form.order,
           description: form.description.trim() || undefined,
+          difficulty: form.difficulty.trim() || undefined,
+          enabled: form.enabled,
+          videoUrl: form.videoUrl.trim() || undefined,
+          activities: form.activities,
         }),
       });
       closeModal();
@@ -68,6 +76,10 @@ export default function Lessons() {
           level: form.level.trim() || undefined,
           order: form.order,
           description: form.description.trim() || undefined,
+          difficulty: form.difficulty.trim() || undefined,
+          enabled: form.enabled,
+          videoUrl: form.videoUrl.trim() || undefined,
+          activities: form.activities,
         }),
       });
       closeModal();
@@ -128,6 +140,8 @@ export default function Lessons() {
               <th>Title</th>
               <th>Duration</th>
               <th>Level</th>
+              <th>Difficulty</th>
+              <th>Enabled</th>
               <th style={{ textAlign: "right" }}>Actions</th>
             </tr>
           </thead>
@@ -137,6 +151,8 @@ export default function Lessons() {
                 <td>{l.title}</td>
                 <td>{l.duration ?? "—"}</td>
                 <td>{l.level ?? "—"}</td>
+                <td>{(l as { difficulty?: string }).difficulty ?? "—"}</td>
+                <td>{(l as { enabled?: boolean }).enabled !== false ? "Yes" : "No"}</td>
                 <td style={{ textAlign: "right" }}>
                   <button type="button" onClick={() => openEdit(l)} className="admin-btn admin-btn-secondary" style={{ padding: "0.25rem 0.6rem", marginRight: 8 }}>
                     Edit
@@ -200,6 +216,124 @@ export default function Lessons() {
                   onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
                   rows={2}
                 />
+              </div>
+              <div className="admin-form-group">
+                <label className="admin-form-label">Difficulty</label>
+                <input
+                  className="admin-input"
+                  value={form.difficulty}
+                  onChange={(e) => setForm((f) => ({ ...f, difficulty: e.target.value }))}
+                  placeholder="e.g. 1 or Beginner"
+                />
+              </div>
+              <div className="admin-form-group">
+                <label className="admin-form-label">
+                  <input
+                    type="checkbox"
+                    checked={form.enabled}
+                    onChange={(e) => setForm((f) => ({ ...f, enabled: e.target.checked }))}
+                  />{" "}
+                  Lesson enabled
+                </label>
+              </div>
+              <div className="admin-form-group">
+                <label className="admin-form-label">YouTube Video URL</label>
+                <input
+                  className="admin-input"
+                  value={form.videoUrl}
+                  onChange={(e) => setForm((f) => ({ ...f, videoUrl: e.target.value }))}
+                  placeholder="https://www.youtube.com/watch?v=..."
+                />
+              </div>
+              <div className="admin-form-group">
+                <label className="admin-form-label">Activities</label>
+                <div style={{ background: "#f8f9fa", padding: "1rem", borderRadius: "8px", border: "1px solid #dee2e6" }}>
+                  {form.activities.map((act: any, idx: number) => (
+                    <div key={idx} style={{ marginBottom: "1rem", paddingBottom: "1rem", borderBottom: "1px solid #eee" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
+                        <span style={{ fontWeight: "700", textTransform: "capitalize" }}>{act.type} Activity</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newAct = [...form.activities];
+                            newAct.splice(idx, 1);
+                            setForm({ ...form, activities: newAct });
+                          }}
+                          style={{ color: "#dc3545", background: "none", border: "none", cursor: "pointer", fontSize: "0.8rem" }}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                      <div className="admin-form-group">
+                        <label className="admin-form-label" style={{ fontSize: "0.8rem" }}>Prompt / Question</label>
+                        <input
+                          className="admin-input"
+                          value={act.prompt || act.question || ""}
+                          onChange={(e) => {
+                            const newAct = [...form.activities];
+                            newAct[idx] = { ...newAct[idx], prompt: e.target.value, question: e.target.value };
+                            setForm({ ...form, activities: newAct });
+                          }}
+                          placeholder="What to show the user?"
+                        />
+                      </div>
+                      {act.type === "typing" || act.type === "mc" ? (
+                        <div className="admin-form-group">
+                          <label className="admin-form-label" style={{ fontSize: "0.8rem" }}>Correct Answer</label>
+                          <input
+                            className="admin-input"
+                            value={act.correctAnswer || ""}
+                            onChange={(e) => {
+                              const newAct = [...form.activities];
+                              newAct[idx] = { ...newAct[idx], correctAnswer: e.target.value };
+                              setForm({ ...form, activities: newAct });
+                            }}
+                          />
+                        </div>
+                      ) : null}
+                      {act.type === "mc" && (
+                        <div className="admin-form-group">
+                          <label className="admin-form-label" style={{ fontSize: "0.8rem" }}>Options (comma separated)</label>
+                          <input
+                            className="admin-input"
+                            value={act.options?.join(", ") || ""}
+                            onChange={(e) => {
+                              const newAct = [...form.activities];
+                              newAct[idx] = { ...newAct[idx], options: e.target.value.split(",").map(t => t.trim()) };
+                              setForm({ ...form, activities: newAct });
+                            }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                  <div style={{ display: "flex", gap: "0.5rem" }}>
+                    <button
+                      type="button"
+                      className="admin-btn admin-btn-secondary"
+                      style={{ fontSize: "0.75rem" }}
+                      onClick={() => setForm({ ...form, activities: [...form.activities, { id: Date.now().toString(), type: "typing", prompt: "", correctAnswer: "" }] })}
+                    >
+                      + Typing
+                    </button>
+                    <button
+                      type="button"
+                      className="admin-btn admin-btn-secondary"
+                      style={{ fontSize: "0.75rem" }}
+                      onClick={() => setForm({ ...form, activities: [...form.activities, { id: Date.now().toString(), type: "mc", question: "", correctAnswer: "", options: [] }] })}
+                    >
+                      + MC
+                    </button>
+                    <button
+                      type="button"
+                      className="admin-btn admin-btn-secondary"
+                      style={{ fontSize: "0.75rem" }}
+                      onClick={() => setForm({ ...form, activities: [...form.activities, { id: Date.now().toString(), type: "audio", prompt: "" }] })}
+                    >
+                      + Audio
+                    </button>
+                  </div>
+                </div>
               </div>
               <div className="admin-form-actions">
                 <button type="button" onClick={closeModal} className="admin-btn admin-btn-secondary">

@@ -11,6 +11,7 @@ const cors = require("cors");
 const { initFirebase, getDb, getAuth } = require("./config/firebase");
 const lessonsRouter = require("./routes/lessons");
 const progressRouter = require("./routes/progress");
+const practiceRouter = require("./routes/practice"); // Add this
 const aiRouter = require("./routes/ai");
 const authRouter = require("./routes/auth");
 const adminRouter = require("./routes/admin");
@@ -34,6 +35,7 @@ app.get("/health", (req, res) => {
 
 app.use("/api/lessons", lessonsRouter);
 app.use("/api/progress", progressRouter);
+app.use("/api/practice", practiceRouter);
 app.use("/api/ai", aiRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/admin", adminRouter);

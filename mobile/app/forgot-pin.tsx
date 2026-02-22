@@ -2,7 +2,7 @@ import { View, Text, ScrollView, TouchableOpacity, Alert } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { colors, spacing, fontSize } from "@/theme";
+import { colors, spacing, fontSize, borderRadius } from "@/theme";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { useAuth } from "@/lib/auth-context";
@@ -98,8 +98,11 @@ export default function ForgotPinScreen() {
           style={{ marginBottom: spacing.md }}
         />
 
-        <TouchableOpacity onPress={() => router.back()} style={{ alignItems: "center" }}>
-          <Text style={{ fontSize: fontSize.sm, color: colors.primary }}>Subiza kuri injira</Text>
+        <TouchableOpacity onPress={() => router.back()} style={{ alignItems: "center", flexDirection: "row", justifyContent: "center", gap: spacing.sm }}>
+          <Text style={{ fontSize: fontSize.sm, color: colors.foreground }}>Subiza kuri</Text>
+          <View style={{ backgroundColor: colors.accentYellow, paddingHorizontal: spacing.sm, paddingVertical: spacing.xs, borderRadius: borderRadius.sm }}>
+            <Text style={{ fontSize: fontSize.sm, fontWeight: "600", color: colors.foreground }}>Injira</Text>
+          </View>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>

@@ -1,19 +1,26 @@
 import { useEffect, useState } from "react";
-import { BookOpen, Users, Activity, RefreshCw } from "lucide-react";
-import { api, type Stats } from "../lib/api";
+import { BookOpen, Users, Activity, RefreshCw, MessageCircle, Target, TrendingUp } from "lucide-react";
+import { api, type Stats, type Analytics } from "../lib/api";
 
 const CARD_ICON_SIZE = 22;
 
 export default function Dashboard() {
   const [stats, setStats] = useState<Stats | null>(null);
+  const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
 
   const load = () => {
     setLoading(true);
     setError("");
-    api<Stats>("/api/admin/stats")
-      .then(setStats)
+    Promise.all([
+      api<Stats>("/api/admin/stats"),
+      api<Analytics>("/api/admin/analytics").catch(() => null),
+    ])
+      .then(([s, a]) => {
+        setStats(s);
+        setAnalytics(a ?? null);
+      })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   };
@@ -46,28 +53,28 @@ export default function Dashboard() {
     );
   }
 
-  const cards = [
-    {
-      label: "Lessons",
-      value: stats!.totalLessons,
-      icon: BookOpen,
-      color: "var(--primary)",
-    },
-    { label: "Users", value: stats!.totalUsers, icon: Users, color: "#1976d2" },
-    {
-      label: "Progress records",
-      value: stats!.totalProgressDocs,
-      icon: Activity,
-      color: "#7b1fa2",
-    },
+  const primaryCards = [
+    { label: "Total lessons", value: stats!.totalLessons, icon: BookOpen, color: "var(--primary)" },
+    { label: "Registered users", value: stats!.totalUsers, icon: Users, color: "#1976d2" },
+    { label: "Progress records", value: stats!.totalProgressDocs, icon: Activity, color: "#7b1fa2" },
   ];
+
+  const analyticsCards = analytics
+    ? [
+        { label: "Active learners", value: `${analytics.activeUsers} / ${analytics.totalUsers}`, icon: Users, color: "#2e7d32" },
+        { label: "Lessons completed (today)", value: analytics.lessonsCompletedToday, icon: Target, color: "#ed6c02" },
+        { label: "Lessons completed (this week)", value: analytics.lessonsCompletedThisWeek, icon: TrendingUp, color: "#0288d1" },
+        { label: "AI usage", value: `${analytics.aiUsagePercent}%`, sub: `${analytics.uniqueAIVisitors} learners, ${analytics.totalAIConversations} chats`, icon: MessageCircle, color: "#9c27b0" },
+        { label: "Avg progress", value: `${analytics.avgProgressPercent}%`, icon: Activity, color: "#00838f" },
+      ]
+    : [];
 
   return (
     <div>
       <div className="admin-page-header">
         <div>
           <h1 className="admin-page-title">Dashboard</h1>
-          <p className="admin-page-subtitle">Overview of lessons, users, and progress.</p>
+          <p className="admin-page-subtitle">Overview of learners, lessons, progress, and AI usage.</p>
         </div>
         <button
           type="button"
@@ -80,7 +87,7 @@ export default function Dashboard() {
         </button>
       </div>
       <div className="admin-stat-cards">
-        {cards.map(({ label, value, icon: Icon, color }) => (
+        {primaryCards.map(({ label, value, icon: Icon, color }) => (
           <div key={label} className="admin-stat-card admin-stat-card-with-icon">
             <div className="admin-stat-card-icon" style={{ background: `${color}18`, color }}>
               <Icon size={CARD_ICON_SIZE} strokeWidth={2} />
@@ -90,6 +97,23 @@ export default function Dashboard() {
           </div>
         ))}
       </div>
+      {analyticsCards.length > 0 && (
+        <>
+          <h2 className="admin-section-title">Learning analytics</h2>
+          <div className="admin-stat-cards">
+            {analyticsCards.map(({ label, value, sub, icon: Icon, color }) => (
+              <div key={label} className="admin-stat-card admin-stat-card-with-icon">
+                <div className="admin-stat-card-icon" style={{ background: `${color}18`, color }}>
+                  <Icon size={CARD_ICON_SIZE} strokeWidth={2} />
+                </div>
+                <div className="admin-stat-card-label">{label}</div>
+                <div className="admin-stat-card-value">{value}</div>
+                {sub && <div className="admin-stat-card-sub">{sub}</div>}
+              </div>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }

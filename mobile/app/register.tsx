@@ -30,7 +30,9 @@ export default function RegisterScreen() {
     clearError();
     try {
       await doRegister(trimmedPhone, name.trim(), pin);
-      router.replace("/(tabs)");
+      Alert.alert("Neza!", "Wiyandikishije neza. Injira ubu.", [
+        { text: "OK", onPress: () => router.replace({ pathname: "/login", params: { registered: "1" } }) },
+      ]);
     } catch {
       // error shown via useAuth().error
     } finally {
@@ -97,14 +99,17 @@ export default function RegisterScreen() {
         ) : null}
 
         <Button
-          title="Yandika"
+          title="Emeza imyirondoro"
           onPress={handleRegister}
           loading={loading}
           style={{ marginBottom: spacing.md }}
         />
 
-        <TouchableOpacity onPress={() => router.back()} style={{ alignItems: "center" }}>
-          <Text style={{ fontSize: fontSize.sm, color: colors.primary }}>Ndi mwenemwo, injira</Text>
+        <TouchableOpacity onPress={() => router.back()} style={{ alignItems: "center", flexDirection: "row", justifyContent: "center", gap: spacing.sm }}>
+          <Text style={{ fontSize: fontSize.sm, color: colors.foreground }}>Usanzwemo?</Text>
+          <View style={{ backgroundColor: colors.accentYellow, paddingHorizontal: spacing.sm, paddingVertical: spacing.xs, borderRadius: borderRadius.sm }}>
+            <Text style={{ fontSize: fontSize.sm, fontWeight: "600", color: colors.foreground }}>Injirira hano</Text>
+          </View>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>

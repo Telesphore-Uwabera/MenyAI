@@ -1,21 +1,25 @@
 import { useEffect, useState } from "react";
 import { api, type User } from "../lib/api";
 
+const SECTOR_OPTIONS = ["", "Kacyiru", "Gikondo"];
+
 export default function Users() {
   const [users, setUsers] = useState<User[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [sectorFilter, setSectorFilter] = useState("");
 
   const load = () => {
     setLoading(true);
     setError("");
-    api<{ users: User[] }>("/api/admin/users")
+    const url = sectorFilter ? `/api/admin/users?sector=${encodeURIComponent(sectorFilter)}` : "/api/admin/users";
+    api<{ users: User[] }>(url)
       .then((r) => setUsers(r.users))
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => load(), []);
+  useEffect(() => load(), [sectorFilter]);
 
   if (loading && users.length === 0) {
     return (
@@ -47,9 +51,24 @@ export default function Users() {
           <h1 className="admin-page-title">Users</h1>
           <p className="admin-page-subtitle">Registered app users.</p>
         </div>
-        <button type="button" onClick={load} disabled={loading} className="admin-btn admin-btn-secondary">
-          {loading ? "Refreshing…" : "Refresh"}
-        </button>
+        <div style={{ display: "flex", gap: "0.75rem", alignItems: "center", flexWrap: "wrap" }}>
+          <label>
+            Sector:{" "}
+            <select
+              className="admin-input"
+              value={sectorFilter}
+              onChange={(e) => setSectorFilter(e.target.value)}
+              style={{ width: "auto", minWidth: 120 }}
+            >
+              {SECTOR_OPTIONS.map((s) => (
+                <option key={s || "all"} value={s}>{s || "All"}</option>
+              ))}
+            </select>
+          </label>
+          <button type="button" onClick={load} disabled={loading} className="admin-btn admin-btn-secondary">
+            {loading ? "Refreshing…" : "Refresh"}
+          </button>
+        </div>
       </div>
       {error && <div className="admin-alert admin-alert-error">{error}</div>}
       <div className="admin-table-wrap">
@@ -57,18 +76,22 @@ export default function Users() {
           <thead>
             <tr>
               <th>UID</th>
-              <th>Email (internal)</th>
               <th>Display name</th>
+              <th>Sector</th>
+              <th>Contact</th>
+              <th>Status</th>
               <th>Created</th>
             </tr>
           </thead>
           <tbody>
             {users.map((u) => (
               <tr key={u.uid}>
-                <td className="admin-table-mono">{u.uid}</td>
-                <td>{u.email ?? "—"}</td>
-                <td>{u.displayName ?? "—"}</td>
-                <td>{u.createdAt ?? "—"}</td>
+                <td className="admin-table-mono">{u.uid.slice(0, 8)}…</td>
+                <td>{u.displayName ?? u.profile?.name ?? "—"}</td>
+                <td>{u.profile?.sector ?? "—"}</td>
+                <td>{u.profile?.contact ?? "—"}</td>
+                <td>{u.disabled ? "Disabled" : "Active"}</td>
+                <td>{u.createdAt ? new Date(u.createdAt).toLocaleDateString() : "—"}</td>
               </tr>
             ))}
           </tbody>

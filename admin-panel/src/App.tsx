@@ -8,6 +8,7 @@ import Users from "./pages/Users";
 import Progress from "./pages/Progress";
 import Settings from "./pages/Settings";
 import Analytics from "./pages/Analytics";
+import AIMonitoring from "./pages/AIMonitoring";
 
 function Protected({ children }: { children: React.ReactNode }) {
   if (!getAdminKey()) return <Navigate to="/login" replace />;
@@ -31,6 +32,7 @@ export default function App() {
         <Route path="users" element={<Users />} />
         <Route path="progress" element={<Progress />} />
         <Route path="analytics" element={<Analytics />} />
+        <Route path="ai-monitoring" element={<AIMonitoring />} />
         <Route path="settings" element={<Settings />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

@@ -100,9 +100,12 @@ export default function AccountScreen() {
 
         <TouchableOpacity
           onPress={handleLogout}
-          style={{ marginTop: spacing.xl, paddingVertical: spacing.sm }}
+          style={{ marginTop: spacing.xl, paddingVertical: spacing.sm, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: spacing.sm }}
         >
-          <Text style={{ fontSize: fontSize.sm, color: colors.mutedForeground }}>Gusohoka / Injira</Text>
+          <Text style={{ fontSize: fontSize.sm, color: colors.mutedForeground }}>Gusohoka /</Text>
+          <View style={{ backgroundColor: colors.accentYellow, paddingHorizontal: spacing.sm, paddingVertical: spacing.xs, borderRadius: borderRadius.sm }}>
+            <Text style={{ fontSize: fontSize.sm, fontWeight: "600", color: colors.foreground }}>Injira</Text>
+          </View>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
