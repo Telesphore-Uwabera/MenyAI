@@ -111,6 +111,20 @@ export const api = {
     }
   },
 
+  async getLessonHistory(token?: string | null): Promise<{ lessonId: string; score: number; passed: boolean; attempts: number; updatedAt: string }[]> {
+    try {
+      const url = `${BASE_URL}/api/progress/history`;
+      const res = await fetch(url, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (!res.ok) return [];
+      const data = await res.json();
+      return data.history ?? [];
+    } catch {
+      return [];
+    }
+  },
+
   async postAiChat(message: string, token?: string | null): Promise<string | null> {
     try {
       const res = await fetch(`${BASE_URL}/api/ai/chat`, {

@@ -27,6 +27,23 @@ router.get("/", async (req, res) => {
   }
 });
 
+/** GET /api/progress/history – per-lesson history for logged-in user */
+router.get("/history", async (req, res) => {
+  try {
+    const decoded = await verifyIdToken(req);
+    const uid = decoded?.uid;
+    const db = getDb();
+    if (!db || !uid) return res.json({ history: [] });
+
+    const snap = await db.collection("progress").doc(uid).collection("history").get();
+    const history = snap.docs.map(doc => ({ lessonId: doc.id, ...doc.data() }));
+    res.json({ history });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+/** POST /api/progress/ – update progress */
 router.post("/", async (req, res) => {
   try {
     const decoded = await verifyIdToken(req);
