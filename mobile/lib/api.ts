@@ -21,6 +21,8 @@ export type ProgressData = {
   totalLessons: number;
   remainingLessons?: number;
   streakDays: number;
+  badge?: { key: string; label: string; color: string; minLessons: number };
+  nextBadge?: { label: string; needsTotal: number; remaining: number } | null;
 };
 
 export type ApiLesson = {
@@ -77,7 +79,7 @@ async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
 export const api = {
   getBaseUrl: () => BASE_URL,
 
-  async getLessons(token?: string | null): Promise<LessonListItem[]> {
+  async getLessons(token?: string | null): Promise<any[]> {
     try {
       const url = `${BASE_URL}/api/lessons`;
       const res = await fetch(url, {
@@ -85,8 +87,7 @@ export const api = {
       });
       if (!res.ok) throw new Error("Failed to fetch lessons");
       const data = await res.json();
-      const list = (data.lessons ?? []) as ApiLesson[];
-      return list.map((l, i) => mapLesson(l, i));
+      return data.lessons ?? [];
     } catch {
       return [];
     }

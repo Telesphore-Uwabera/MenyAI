@@ -17,8 +17,10 @@ type HistoryItem = {
 export default function ProgressScreen() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [progress, setProgress] = useState({ completedLessons: 0, totalLessons: 45, streakDays: 0, remainingLessons: 45 });
+  const [progress, setProgress] = useState({ completedLessons: 0, totalLessons: 30, streakDays: 0, remainingLessons: 30 });
   const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [badge, setBadge] = useState<{ key: string; label: string; color: string } | null>(null);
+  const [nextBadge, setNextBadge] = useState<{ label: string; needsTotal: number; remaining: number } | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -33,6 +35,8 @@ export default function ProgressScreen() {
           streakDays: p.streakDays,
           remainingLessons: p.remainingLessons ?? (p.totalLessons - p.completedLessons),
         });
+        if (p.badge?.key !== "none") setBadge(p.badge ?? null);
+        setNextBadge(p.nextBadge ?? null);
       }
       setHistory(h);
       setLoading(false);
@@ -43,6 +47,10 @@ export default function ProgressScreen() {
   const percent = progress.totalLessons
     ? Math.round((progress.completedLessons / progress.totalLessons) * 100)
     : 0;
+
+  const nextPercent = nextBadge
+    ? Math.round(((progress.completedLessons) / nextBadge.needsTotal) * 100)
+    : 100;
 
   const formatDate = (iso: string) => {
     try {
@@ -73,6 +81,73 @@ export default function ProgressScreen() {
           contentContainerStyle={{ padding: spacing.md, paddingBottom: 100 }}
           showsVerticalScrollIndicator={false}
         >
+          {/* Badge Card */}
+          {badge ? (
+            <View style={{
+              backgroundColor: badge.color,
+              borderRadius: borderRadius.lg,
+              padding: spacing.lg,
+              marginBottom: spacing.md,
+              flexDirection: "row",
+              alignItems: "center",
+              gap: spacing.md,
+              shadowColor: badge.color, shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.35, shadowRadius: 12, elevation: 6,
+            }}>
+              <Text style={{ fontSize: 48 }}>
+                {badge.label.split(" ").pop()}
+              </Text>
+              <View style={{ flex: 1 }}>
+                <Text style={{ color: "#fff", fontSize: fontSize.xs, fontWeight: "600", opacity: 0.85 }}>IMPAMYABUSHOBOZI YAWE</Text>
+                <Text style={{ color: "#fff", fontSize: fontSize["2xl"], fontWeight: "800", marginTop: 2 }}>
+                  {badge.label.split(" ").slice(0, -1).join(" ")}
+                </Text>
+                <Text style={{ color: "rgba(255,255,255,0.8)", fontSize: fontSize.xs, marginTop: 4 }}>
+                  Warangije amasomo {progress.completedLessons}. Komeza gutsinda!
+                </Text>
+              </View>
+            </View>
+          ) : (
+            <View style={{
+              backgroundColor: colors.card, borderRadius: borderRadius.lg,
+              padding: spacing.lg, marginBottom: spacing.md,
+              flexDirection: "row", alignItems: "center", gap: spacing.md,
+              borderWidth: 2, borderColor: colors.border, borderStyle: "dashed",
+            }}>
+              <Text style={{ fontSize: 40 }}>🏅</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: fontSize.base, fontWeight: "700", color: colors.foreground }}>
+                  Rangira isomo rya mbere!
+                </Text>
+                <Text style={{ fontSize: fontSize.xs, color: colors.mutedForeground, marginTop: 2 }}>
+                  Uzahabwa umudari wa Inzibacyuho 🥉 nyuma yo gutsinda isomo rimwe.
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Next Badge Goal */}
+          {nextBadge && (
+            <View style={{
+              backgroundColor: colors.card, borderRadius: borderRadius.lg,
+              padding: spacing.md, marginBottom: spacing.md,
+              shadowColor: "#000", shadowOffset: { width: 0, height: 1 },
+              shadowOpacity: 0.06, shadowRadius: 4, elevation: 1,
+            }}>
+              <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: spacing.xs }}>
+                <Text style={{ fontSize: fontSize.sm, color: colors.mutedForeground }}>
+                  Umudari ukurikira: <Text style={{ fontWeight: "700", color: colors.foreground }}>{nextBadge.label}</Text>
+                </Text>
+                <Text style={{ fontSize: fontSize.sm, fontWeight: "700", color: colors.primary }}>
+                  {nextBadge.remaining} asigaye
+                </Text>
+              </View>
+              <View style={{ height: 6, backgroundColor: colors.muted, borderRadius: 3, overflow: "hidden" }}>
+                <View style={{ width: `${Math.min(nextPercent, 100)}%`, height: "100%", backgroundColor: colors.primary, borderRadius: 3 }} />
+              </View>
+            </View>
+          )}
+
           {/* Overall Progress Bar */}
           <View style={{
             backgroundColor: colors.card,

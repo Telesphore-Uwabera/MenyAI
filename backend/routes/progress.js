@@ -7,20 +7,45 @@ const { getDb, verifyIdToken } = require("../config/firebase");
 
 const router = express.Router();
 
+/** Compute badge tier from completed lesson count */
+function getBadge(completed) {
+  if (completed >= 30) return { key: "champion", label: "Intsinzi 🏆", color: "#A855F7", minLessons: 30 };
+  if (completed >= 21) return { key: "diamond", label: "Almasi 💎", color: "#06B6D4", minLessons: 21 };
+  if (completed >= 11) return { key: "gold", label: "Zahabu 🥇", color: "#F59E0B", minLessons: 11 };
+  if (completed >= 6) return { key: "silver", label: "Ifeza 🥈", color: "#94A3B8", minLessons: 6 };
+  if (completed >= 1) return { key: "bronze", label: "Inzibacyuho 🥉", color: "#CD7F32", minLessons: 1 };
+  return { key: "none", label: null, color: null, minLessons: 0 };
+}
+
+function nextBadge(completed) {
+  if (completed >= 30) return null;
+  if (completed >= 21) return { label: "Intsinzi 🏆", needsTotal: 30, remaining: 30 - completed };
+  if (completed >= 11) return { label: "Almasi 💎", needsTotal: 21, remaining: 21 - completed };
+  if (completed >= 6) return { label: "Zahabu 🥇", needsTotal: 11, remaining: 11 - completed };
+  if (completed >= 1) return { label: "Ifeza 🥈", needsTotal: 6, remaining: 6 - completed };
+  return { label: "Inzibacyuho 🥉", needsTotal: 1, remaining: 1 - completed };
+}
+
 router.get("/", async (req, res) => {
   try {
     const decoded = await verifyIdToken(req);
     const uid = decoded?.uid;
     const db = getDb();
+
+    let data = { completedLessons: 0, totalLessons: 30, remainingLessons: 30, streakDays: 0 };
+
     if (db && uid) {
       const doc = await db.collection("progress").doc(uid).get();
-      if (doc.exists) return res.json(doc.data());
+      if (doc.exists) data = { ...data, ...doc.data() };
     }
+
+    const completed = data.completedLessons ?? 0;
     res.json({
-      completedLessons: 0,
-      totalLessons: 45,
-      remainingLessons: 45,
-      streakDays: 0,
+      ...data,
+      totalLessons: 30,
+      remainingLessons: 30 - completed,
+      badge: getBadge(completed),
+      nextBadge: nextBadge(completed),
     });
   } catch (e) {
     res.status(500).json({ error: e.message });

@@ -1,170 +1,204 @@
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
-import { useRouter } from "expo-router";
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useEffect, useState } from "react";
+import { useRouter } from "expo-router";
 import { colors, spacing, fontSize, borderRadius } from "@/theme";
-import { MOCK_LESSON_LIST } from "@/data/mock";
-import { api, type LessonListItem } from "@/lib/api";
-import { Button } from "@/components/ui/Button";
+import { api } from "@/lib/api";
+
+type Lesson = {
+  id: string;
+  title: string;
+  subtitle?: string;
+  duration?: string;
+  level?: string;
+  module?: string;
+  moduleColor?: string;
+  order?: number;
+  activities?: any[];
+};
+
+const MODULE_META: Record<string, { icon: string; color: string; description: string }> = {
+  "Imirongo": { icon: "pencil", color: "#4CAF78", description: "Lines & Strokes" },
+  "Inyuguti": { icon: "text", color: "#3B82F6", description: "Letters & Words" },
+  "Imibare": { icon: "calculator", color: "#F59E0B", description: "Numbers & Math" },
+  "Imishusho": { icon: "shapes", color: "#EC4899", description: "Shapes & Colors" },
+};
 
 export default function LessonsScreen() {
   const router = useRouter();
-  const [lessons, setLessons] = useState<LessonListItem[]>([]);
+  const [lessons, setLessons] = useState<Lesson[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.getLessons(null).then((list) => {
-      setLessons(list);
+    const load = async () => {
+      const list = await api.getLessons(null);
+      setLessons(list as any[]);
       setLoading(false);
-    });
+    };
+    load();
   }, []);
+
+  // Group lessons by module, sorted by order
+  const grouped = lessons
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+    .reduce<Record<string, Lesson[]>>((acc, l) => {
+      const mod = (l as any).module ?? "Ibindi";
+      if (!acc[mod]) acc[mod] = [];
+      acc[mod].push(l);
+      return acc;
+    }, {});
+
+  const modules = Object.keys(grouped);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["top"]}>
-      <View
-        style={{
-          paddingHorizontal: spacing.md,
-          paddingTop: spacing.md,
-          paddingBottom: spacing.sm,
-          borderBottomWidth: 1,
-          borderBottomColor: colors.border,
-        }}
-      >
-        <Text style={{ fontSize: fontSize["2xl"], fontWeight: "700", color: colors.foreground }}>
+      {/* Header */}
+      <View style={{
+        paddingHorizontal: spacing.md,
+        paddingTop: spacing.md,
+        paddingBottom: spacing.sm,
+        borderBottomWidth: 1,
+        borderBottomColor: colors.border,
+      }}>
+        <Text style={{ fontSize: fontSize["2xl"], fontWeight: "800", color: colors.foreground }}>
           Amasomo
+        </Text>
+        <Text style={{ fontSize: fontSize.sm, color: colors.mutedForeground, marginTop: 2 }}>
+          {loading ? "..." : `Amasomo ${lessons.length} — Hitamo isomo ubona`}
         </Text>
       </View>
 
-      <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={{ padding: spacing.md, paddingBottom: 100 }}
-        showsVerticalScrollIndicator={false}
-      >
-        <Text style={{ fontSize: fontSize.xl, fontWeight: "700", color: colors.foreground, marginBottom: spacing.lg }}>
-          Urwego 1 - Ibanze
-        </Text>
+      {loading ? (
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Text style={{ color: colors.mutedForeground, marginTop: spacing.md }}>Gutegura amasomo...</Text>
+        </View>
+      ) : lessons.length === 0 ? (
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: spacing.xl }}>
+          <Ionicons name="book-outline" size={64} color={colors.mutedForeground} />
+          <Text style={{ color: colors.mutedForeground, marginTop: spacing.md, fontSize: fontSize.base, textAlign: "center" }}>
+            Nta masomo ahari ubu.
+          </Text>
+        </View>
+      ) : (
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{ padding: spacing.md, paddingBottom: 120 }}
+          showsVerticalScrollIndicator={false}
+        >
+          {modules.map((mod) => {
+            const meta = MODULE_META[mod] ?? { icon: "school", color: colors.primary, description: "" };
+            const modLessons = grouped[mod];
 
-        {loading ? (
-          <View style={{ padding: spacing.xl, alignItems: "center" }}>
-            <Text style={{ color: colors.mutedForeground }}>Loading lessons...</Text>
-          </View>
-        ) : lessons.length === 0 ? (
-          <View style={{ padding: spacing.xl, alignItems: "center" }}>
-            <Ionicons name="documents-outline" size={48} color={colors.mutedForeground} />
-            <Text style={{ color: colors.mutedForeground, marginTop: spacing.md, fontSize: fontSize.base }}>
-              Nta masomo araboneka.
-            </Text>
-          </View>
-        ) : (
-          lessons.map((lesson) => (
-            <TouchableOpacity
-              key={lesson.id}
-              onPress={() => lesson.status !== "new" && router.push(`/lesson/${lesson.id}`)}
-              activeOpacity={0.9}
-              style={{
-                backgroundColor: colors.card,
-                borderRadius: borderRadius.lg,
-                overflow: "hidden",
-                marginBottom: spacing.md,
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.08,
-                shadowRadius: 8,
-                elevation: 2,
-              }}
-            >
-              {/* Lesson image area */}
-              <View
-                style={{
-                  height: 140,
-                  backgroundColor: lesson.gradient?.[0] ?? colors.primaryMuted,
+            return (
+              <View key={mod} style={{ marginBottom: spacing.xl }}>
+                {/* Module Header */}
+                <View style={{
+                  flexDirection: "row",
                   alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Ionicons name={lesson.icon as any} size={48} color={colors.primaryDark} />
-              </View>
-              <View style={{ padding: spacing.md }}>
-                <Text style={{ fontSize: fontSize.base, fontWeight: "700", color: colors.foreground, marginBottom: spacing.sm }}>
-                  {lesson.title}
-                </Text>
-                <View style={{ flexDirection: "row", gap: spacing.md, marginBottom: spacing.sm }}>
-                  <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-                    <Ionicons name="time-outline" size={14} color={colors.mutedForeground} />
-                    <Text style={{ fontSize: fontSize.xs, color: colors.mutedForeground }}>{lesson.duration}</Text>
+                  gap: spacing.sm,
+                  marginBottom: spacing.md,
+                }}>
+                  <View style={{
+                    width: 36, height: 36, borderRadius: 18,
+                    backgroundColor: meta.color + "22",
+                    alignItems: "center", justifyContent: "center",
+                  }}>
+                    <Ionicons name={meta.icon as any} size={18} color={meta.color} />
                   </View>
-                  <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-                    <Ionicons name="volume-high" size={14} color={colors.mutedForeground} />
-                    <Text style={{ fontSize: fontSize.xs, color: colors.mutedForeground }}>{lesson.meta}</Text>
+                  <View>
+                    <Text style={{ fontSize: fontSize.lg, fontWeight: "700", color: colors.foreground }}>
+                      {mod}
+                    </Text>
+                    <Text style={{ fontSize: fontSize.xs, color: colors.mutedForeground }}>
+                      {meta.description} • {modLessons.length} amasomo
+                    </Text>
                   </View>
                 </View>
 
-                {lesson.status === "completed" && (
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      gap: 4,
-                      backgroundColor: colors.primaryMuted,
-                      paddingVertical: 4,
-                      paddingHorizontal: 12,
-                      borderRadius: 12,
-                      alignSelf: "flex-start",
-                    }}
-                  >
-                    <Ionicons name="checkmark-circle" size={16} color={colors.success} />
-                    <Text style={{ fontSize: fontSize.xs, fontWeight: "600", color: colors.success }}>
-                      Yararangiye
-                    </Text>
-                  </View>
-                )}
-
-                {lesson.status === "progress" && (
-                  <>
-                    <View style={{ height: 6, backgroundColor: colors.muted, borderRadius: 3, marginBottom: spacing.xs, overflow: "hidden" }}>
-                      <View
-                        style={{
-                          width: `${lesson.progress}%`,
-                          height: "100%",
-                          backgroundColor: colors.primary,
-                          borderRadius: 3,
-                        }}
-                      />
-                    </View>
-                    <View
+                {/* Lesson Cards */}
+                {modLessons.map((lesson, idx) => {
+                  const isCompleted = false; // TODO: wire from progress history
+                  return (
+                    <TouchableOpacity
+                      key={lesson.id}
+                      onPress={() => router.push(`/lesson/${lesson.id}` as any)}
+                      activeOpacity={0.85}
                       style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        gap: 4,
-                        backgroundColor: colors.warningBg,
-                        paddingVertical: 4,
-                        paddingHorizontal: 12,
-                        borderRadius: 12,
-                        alignSelf: "flex-start",
+                        backgroundColor: colors.card,
+                        borderRadius: borderRadius.lg,
+                        marginBottom: spacing.sm,
+                        overflow: "hidden",
+                        shadowColor: "#000",
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.07,
+                        shadowRadius: 8,
+                        elevation: 2,
+                        borderLeftWidth: 4,
+                        borderLeftColor: meta.color,
                       }}
                     >
-                      <Ionicons name="hourglass-outline" size={16} color={colors.warning} />
-                      <Text style={{ fontSize: fontSize.xs, fontWeight: "600", color: colors.warning }}>
-                        Urikuri
-                      </Text>
-                    </View>
-                  </>
-                )}
+                      <View style={{ padding: spacing.md, flexDirection: "row", alignItems: "center" }}>
+                        {/* Order badge */}
+                        <View style={{
+                          width: 40, height: 40, borderRadius: 20,
+                          backgroundColor: meta.color + "18",
+                          alignItems: "center", justifyContent: "center",
+                          marginRight: spacing.md,
+                        }}>
+                          <Text style={{ fontSize: fontSize.sm, fontWeight: "700", color: meta.color }}>
+                            {(lesson as any).order ?? idx + 1}
+                          </Text>
+                        </View>
 
-                {lesson.status === "new" && (
-                  <Button
-                    title="Tangira Isomo"
-                    onPress={() => router.push(`/lesson/${lesson.id}`)}
-                    variant="primary"
-                    style={{ marginTop: spacing.sm }}
-                  />
-                )}
+                        {/* Lesson Info */}
+                        <View style={{ flex: 1 }}>
+                          <Text style={{ fontSize: fontSize.base, fontWeight: "700", color: colors.foreground }}>
+                            {lesson.title}
+                          </Text>
+                          {(lesson as any).subtitle && (
+                            <Text style={{ fontSize: fontSize.xs, color: colors.mutedForeground, marginTop: 1 }}>
+                              {(lesson as any).subtitle}
+                            </Text>
+                          )}
+                          <View style={{ flexDirection: "row", gap: spacing.sm, marginTop: spacing.xs }}>
+                            {lesson.duration && (
+                              <View style={{ flexDirection: "row", alignItems: "center", gap: 3 }}>
+                                <Ionicons name="time-outline" size={11} color={colors.mutedForeground} />
+                                <Text style={{ fontSize: 11, color: colors.mutedForeground }}>{lesson.duration}</Text>
+                              </View>
+                            )}
+                            {(lesson as any).activities?.length > 0 && (
+                              <View style={{ flexDirection: "row", alignItems: "center", gap: 3 }}>
+                                <Ionicons name="list-outline" size={11} color={colors.mutedForeground} />
+                                <Text style={{ fontSize: 11, color: colors.mutedForeground }}>
+                                  {(lesson as any).activities.length} ibibazo
+                                </Text>
+                              </View>
+                            )}
+                            {(lesson as any).difficulty && (
+                              <View style={{ flexDirection: "row", alignItems: "center", gap: 3 }}>
+                                <Ionicons name="bar-chart-outline" size={11} color={colors.mutedForeground} />
+                                <Text style={{ fontSize: 11, color: colors.mutedForeground }}>
+                                  {(lesson as any).difficulty}
+                                </Text>
+                              </View>
+                            )}
+                          </View>
+                        </View>
+
+                        {/* Arrow */}
+                        <Ionicons name="chevron-forward" size={20} color={meta.color} />
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
-            </TouchableOpacity>
-          ))
-        )}
-      </ScrollView>
+            );
+          })}
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 }
