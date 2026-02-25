@@ -32,7 +32,14 @@ router.get("/", async (req, res) => {
     const uid = decoded?.uid;
     const db = getDb();
 
-    let data = { completedLessons: 0, totalLessons: 30, remainingLessons: 30, streakDays: 0 };
+    // Get actual total lessons count from Firebase
+    let totalLessons = 30; // fallback
+    if (db) {
+      const lessonsSnap = await db.collection("lessons").get();
+      totalLessons = lessonsSnap.size;
+    }
+
+    let data = { completedLessons: 0, totalLessons, remainingLessons: totalLessons, streakDays: 0 };
 
     if (db && uid) {
       const doc = await db.collection("progress").doc(uid).get();
@@ -42,8 +49,8 @@ router.get("/", async (req, res) => {
     const completed = data.completedLessons ?? 0;
     res.json({
       ...data,
-      totalLessons: 30,
-      remainingLessons: 30 - completed,
+      totalLessons,
+      remainingLessons: totalLessons - completed,
       badge: getBadge(completed),
       nextBadge: nextBadge(completed),
     });

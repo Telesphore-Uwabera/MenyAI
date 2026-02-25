@@ -339,4 +339,100 @@ router.get("/ai-stats", async (req, res) => {
   }
 });
 
+/** GET /api/admin/reports – comprehensive learner & lesson reports */
+router.get("/reports", async (req, res) => {
+  try {
+    const db = getDb();
+    const auth = getAuth();
+    if (!db) return res.status(503).json({ error: "Database not configured" });
+
+    // 1. All lessons
+    const lessonsSnap = await db.collection("lessons").orderBy("order").get();
+    const lessons = lessonsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const totalLessons = lessons.length;
+
+    // 2. All learner progress docs
+    const progressSnap = await db.collection("progress").get();
+    const learners = [];
+    let totalCompletions = 0;
+    let totalScoreSum = 0;
+    let totalScoreCount = 0;
+
+    const lessonPassCounts = {}; // lessonId → { pass, fail }
+
+    for (const doc of progressSnap.docs) {
+      const data = doc.data();
+      const completed = data.completedLessons ?? 0;
+      totalCompletions += completed;
+
+      // Badge tier
+      let badge = "Ntanumwe";
+      if (completed >= 30) badge = "Intsinzi 🏆";
+      else if (completed >= 21) badge = "Almasi 💎";
+      else if (completed >= 11) badge = "Zahabu 🥇";
+      else if (completed >= 6) badge = "Ifeza 🥈";
+      else if (completed >= 1) badge = "Inzibacyuho 🥉";
+
+      // Lesson history sub-collection
+      const historySnap = await db.collection("progress").doc(doc.id).collection("history").get();
+      const history = historySnap.docs.map(h => ({ lessonId: h.id, ...h.data() }));
+      const avgScore = history.length
+        ? Math.round(history.reduce((s, h) => s + (h.score ?? 0), 0) / history.length)
+        : null;
+      if (avgScore !== null) { totalScoreSum += avgScore; totalScoreCount++; }
+
+      history.forEach(h => {
+        if (!lessonPassCounts[h.lessonId]) lessonPassCounts[h.lessonId] = { pass: 0, fail: 0 };
+        h.passed ? lessonPassCounts[h.lessonId].pass++ : lessonPassCounts[h.lessonId].fail++;
+      });
+
+      learners.push({
+        uid: doc.id,
+        completedLessons: completed,
+        streakDays: data.streakDays ?? 0,
+        badge,
+        avgScore,
+        lastActive: data.updatedAt ?? null,
+        historyCount: history.length,
+      });
+    }
+
+    // 3. Per-lesson report
+    const lessonReport = lessons.map(l => ({
+      id: l.id,
+      title: l.title,
+      module: l.module,
+      order: l.order,
+      passCount: lessonPassCounts[l.id]?.pass ?? 0,
+      failCount: lessonPassCounts[l.id]?.fail ?? 0,
+      totalAttempts: (lessonPassCounts[l.id]?.pass ?? 0) + (lessonPassCounts[l.id]?.fail ?? 0),
+      passRate: lessonPassCounts[l.id]
+        ? Math.round((lessonPassCounts[l.id].pass / ((lessonPassCounts[l.id].pass + lessonPassCounts[l.id].fail) || 1)) * 100)
+        : null,
+    }));
+
+    // 4. Summary
+    const avgClassScore = totalScoreCount ? Math.round(totalScoreSum / totalScoreCount) : 0;
+    const badgeCounts = learners.reduce((acc, l) => {
+      acc[l.badge] = (acc[l.badge] || 0) + 1;
+      return acc;
+    }, {});
+
+    res.json({
+      summary: {
+        totalLessons,
+        totalLearners: learners.length,
+        totalCompletions,
+        avgClassScore,
+        badgeCounts,
+      },
+      learners: learners.sort((a, b) => b.completedLessons - a.completedLessons),
+      lessonReport,
+      generatedAt: new Date().toISOString(),
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 module.exports = router;

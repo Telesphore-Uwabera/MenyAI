@@ -4,7 +4,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useEffect, useState } from "react";
 import { colors, spacing, fontSize, borderRadius } from "@/theme";
-import { MOCK_PROGRESS } from "@/data/mock";
 import { useAuth } from "@/lib/auth-context";
 import { api } from "@/lib/api";
 
@@ -12,10 +11,10 @@ export default function HomeScreen() {
   const router = useRouter();
   const { user } = useAuth();
   const userName = user?.displayName?.trim() || "";
-  const [progress, setProgress] = useState({ completedLessons: 0, totalLessons: 45, streakDays: 0, remainingLessons: 45 });
+  const [progress, setProgress] = useState({ completedLessons: 0, totalLessons: 31, streakDays: 0, remainingLessons: 31 });
 
   useEffect(() => {
-    api.getProgress(null).then((p) => {
+    api.getProgress(user?.token || null).then((p) => {
       if (p) setProgress({
         completedLessons: p.completedLessons,
         totalLessons: p.totalLessons,
@@ -23,7 +22,7 @@ export default function HomeScreen() {
         remainingLessons: p.remainingLessons ?? (p.totalLessons - p.completedLessons)
       });
     });
-  }, []);
+  }, [user]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["top"]}>

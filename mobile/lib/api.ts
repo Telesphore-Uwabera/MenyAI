@@ -103,8 +103,8 @@ export const api = {
       const data = await res.json();
       return {
         completedLessons: data.completedLessons ?? 0,
-        totalLessons: data.totalLessons ?? 50,
-        remainingLessons: data.remainingLessons ?? (data.totalLessons ?? 50) - (data.completedLessons ?? 0),
+        totalLessons: data.totalLessons ?? 31, // Updated default to match Firebase
+        remainingLessons: data.remainingLessons ?? (data.totalLessons ?? 31) - (data.completedLessons ?? 0),
         streakDays: data.streakDays ?? 0,
       };
     } catch {

@@ -6,6 +6,7 @@ import {
   TrendingUp,
   BarChart3,
   MessageCircle,
+  FileText,
   Settings,
   LogOut,
 } from "lucide-react";
@@ -17,7 +18,8 @@ const nav = [
   { to: "/users", label: "Users", icon: Users },
   { to: "/progress", label: "Progress", icon: TrendingUp },
   { to: "/analytics", label: "Analytics", icon: BarChart3 },
-  { to: "/ai-monitoring", label: "AI monitoring", icon: MessageCircle },
+  { to: "/ai-monitoring", label: "AI Monitoring", icon: MessageCircle },
+  { to: "/reports", label: "📊 Raporo", icon: FileText },
   { to: "/settings", label: "Settings", icon: Settings },
 ];
 

@@ -1,16 +1,56 @@
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors, spacing, fontSize, borderRadius } from "@/theme";
-import { getLessonsForLevel, getLevelDurationMinutes } from "@/data/mock";
+import { useAuth } from "@/lib/auth-context";
+import { api } from "@/lib/api";
+import { useState, useEffect } from "react";
 
 export default function LearnLevelScreen() {
   const { level } = useLocalSearchParams<{ level: string }>();
   const router = useRouter();
+  const { user } = useAuth();
   const levelId = level ?? "1";
-  const lessons = getLessonsForLevel(levelId);
-  const durationMin = getLevelDurationMinutes(levelId);
+  const [loading, setLoading] = useState(true);
+  const [lessons, setLessons] = useState<any[]>([]);
+  const [durationMin] = useState(60); // Default duration
+
+  useEffect(() => {
+    const fetchLessons = async () => {
+      try {
+        const allLessons = await api.getLessons(user?.token || null);
+        const levelLessons = allLessons.filter((lesson: any) => lesson.level === levelId);
+        setLessons(levelLessons);
+      } catch (err) {
+        console.error("Failed to fetch lessons:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user) {
+      fetchLessons();
+    } else {
+      setLoading(false);
+    }
+  }, [levelId, user]);
+
+  if (loading) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </SafeAreaView>
+    );
+  }
+
+  if (!user) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background, justifyContent: "center", alignItems: "center" }}>
+        <Text style={{ fontSize: fontSize.lg, color: colors.foreground }}>Tuzakugurire</Text>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["top"]}>

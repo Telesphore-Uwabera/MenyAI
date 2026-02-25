@@ -1,7 +1,8 @@
-import { View, Text, ScrollView, ActivityIndicator } from "react-native";
+import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useEffect, useState } from "react";
+import { useRouter } from "expo-router";
 import { colors, spacing, fontSize, borderRadius } from "@/theme";
 import { api } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
@@ -15,6 +16,7 @@ type HistoryItem = {
 };
 
 export default function ProgressScreen() {
+  const router = useRouter();
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState({ completedLessons: 0, totalLessons: 30, streakDays: 0, remainingLessons: 30 });
@@ -81,6 +83,30 @@ export default function ProgressScreen() {
           contentContainerStyle={{ padding: spacing.md, paddingBottom: 100 }}
           showsVerticalScrollIndicator={false}
         >
+          {/* Quick Actions */}
+          <View style={{ flexDirection: "row", gap: spacing.sm, marginBottom: spacing.md }}>
+            <TouchableOpacity
+              onPress={() => router.push("/review" as any)}
+              style={{ flex: 1, backgroundColor: "#EEF2FF", borderRadius: borderRadius.md, padding: spacing.md, flexDirection: "row", alignItems: "center", gap: spacing.sm }}
+            >
+              <Ionicons name="albums" size={22} color="#6366F1" />
+              <View>
+                <Text style={{ fontWeight: "700", color: "#6366F1", fontSize: fontSize.sm }}>Flashcards</Text>
+                <Text style={{ fontSize: 10, color: "#8182C4" }}>Subiramo amagambo</Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => router.push("/report" as any)}
+              style={{ flex: 1, backgroundColor: "#F0FDF4", borderRadius: borderRadius.md, padding: spacing.md, flexDirection: "row", alignItems: "center", gap: spacing.sm }}
+            >
+              <Ionicons name="ribbon" size={22} color={colors.primary} />
+              <View>
+                <Text style={{ fontWeight: "700", color: colors.primary, fontSize: fontSize.sm }}>Raporo</Text>
+                <Text style={{ fontSize: 10, color: colors.mutedForeground }}>Raporo yanjye</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+
           {/* Badge Card */}
           {badge ? (
             <View style={{

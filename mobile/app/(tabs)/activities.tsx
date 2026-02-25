@@ -1,10 +1,51 @@
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors, spacing, fontSize, borderRadius } from "@/theme";
-import { MOCK_ACTIVITIES } from "@/data/mock";
+import { useAuth } from "@/lib/auth-context";
+import { api } from "@/lib/api";
+import { useState, useEffect } from "react";
 
 export default function ActivitiesScreen() {
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [activities, setActivities] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const activitiesData = await api.getPractice();
+        setActivities(activitiesData);
+      } catch (err) {
+        console.error("Failed to fetch activities:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user) {
+      fetchData();
+    } else {
+      setLoading(false);
+    }
+  }, [user]);
+
+  if (loading) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </SafeAreaView>
+    );
+  }
+
+  if (!user) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background, justifyContent: "center", alignItems: "center" }}>
+        <Text style={{ fontSize: fontSize.lg, color: colors.foreground }}>Tuzakugurire</Text>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["top"]}>
       <View style={{ padding: spacing.md }}>
@@ -15,12 +56,13 @@ export default function ActivitiesScreen() {
           Reba inyandiko y'aho wanduye mu masomo
         </Text>
       </View>
+
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{ padding: spacing.md, paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
       >
-        {MOCK_ACTIVITIES.map((act) => (
+        {activities.map((act) => (
           <TouchableOpacity
             key={act.id}
             style={{
@@ -58,21 +100,24 @@ export default function ActivitiesScreen() {
             <Ionicons name="chevron-forward" size={20} color={colors.mutedForeground} />
           </TouchableOpacity>
         ))}
-        <View
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            paddingVertical: spacing.xl,
-            backgroundColor: colors.muted,
-            borderRadius: borderRadius.md,
-            marginTop: spacing.md,
-          }}
-        >
-          <Ionicons name="add-circle-outline" size={40} color={colors.primary} />
-          <Text style={{ fontSize: fontSize.sm, color: colors.mutedForeground, marginTop: spacing.sm }}>
-            Komeza kwiga kugira ngo ubone ibikorwa bishya
-          </Text>
-        </View>
+        
+        {activities.length === 0 && (
+          <View
+            style={{
+              alignItems: "center",
+              justifyContent: "center",
+              paddingVertical: spacing.xl,
+              backgroundColor: colors.muted,
+              borderRadius: borderRadius.md,
+              marginTop: spacing.md,
+            }}
+          >
+            <Ionicons name="add-circle-outline" size={40} color={colors.primary} />
+            <Text style={{ fontSize: fontSize.sm, color: colors.mutedForeground, marginTop: spacing.sm }}>
+              Komeza kwiga kugira ngo ubone ibikorwa bishya
+            </Text>
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );

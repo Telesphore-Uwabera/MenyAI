@@ -1,12 +1,73 @@
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors, spacing, fontSize, borderRadius } from "@/theme";
-import { MOCK_LESSONS, MOCK_LEVELS } from "@/data/mock";
+import { useAuth } from "@/lib/auth-context";
+import { api } from "@/lib/api";
+import { useState, useEffect } from "react";
 
 export default function LevelsScreen() {
   const router = useRouter();
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [lessons, setLessons] = useState<any[]>([]);
+  const [levels, setLevels] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const lessonsData = await api.getLessons(user?.token || null);
+        setLessons(lessonsData);
+
+        // Group lessons by level
+        const levelsMap: Record<string, any[]> = {};
+        lessonsData.forEach((lesson: any) => {
+          const levelId = lesson.level || "1";
+          if (!levelsMap[levelId]) {
+            levelsMap[levelId] = [];
+          }
+          levelsMap[levelId].push(lesson);
+        });
+
+        // Convert to levels array
+        const levelsArray = Object.keys(levelsMap).map(levelId => ({
+          id: levelId,
+          label: `Ikirenga ${levelId}`,
+          lessonCount: levelsMap[levelId].length,
+          lessons: levelsMap[levelId]
+        }));
+
+        setLevels(levelsArray);
+      } catch (err) {
+        console.error("Failed to fetch lessons:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user) {
+      fetchData();
+    } else {
+      setLoading(false);
+    }
+  }, [user]);
+
+  if (loading) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </SafeAreaView>
+    );
+  }
+
+  if (!user) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background, justifyContent: "center", alignItems: "center" }}>
+        <Text style={{ fontSize: fontSize.lg, color: colors.foreground }}>Tuzakugurire</Text>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["top"]}>
@@ -29,10 +90,10 @@ export default function LevelsScreen() {
           Hitamo Icyiciro
         </Text>
 
-        {MOCK_LESSONS.map((lesson) => (
+        {levels.map((level) => (
           <TouchableOpacity
-            key={lesson.id}
-            onPress={() => router.push(`/(tabs)/learn/${lesson.id}`)}
+            key={level.id}
+            onPress={() => router.push(`/(tabs)/learn/${level.id}`)}
             style={{
               backgroundColor: colors.card,
               borderRadius: borderRadius.lg,
@@ -56,7 +117,7 @@ export default function LevelsScreen() {
                 <Ionicons name="book" size={20} color="#b45309" />
               </View>
               <Text style={{ fontSize: fontSize.base, fontWeight: "600", color: colors.foreground, marginLeft: spacing.md }}>
-                {lesson.title}
+                {level.label}
               </Text>
             </View>
             <View
@@ -67,54 +128,11 @@ export default function LevelsScreen() {
                 justifyContent: "center",
               }}
             >
-              <Ionicons name={lesson.icon} size={48} color={colors.primary} />
-              {lesson.completed && (
-                <View
-                  style={{
-                    position: "absolute",
-                    top: spacing.sm,
-                    right: spacing.sm,
-                    width: 32,
-                    height: 32,
-                    borderRadius: 16,
-                    backgroundColor: "rgba(255,255,255,0.9)",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Ionicons name="checkmark-circle" size={24} color={colors.primary} />
-                </View>
-              )}
+              <Ionicons name="school" size={48} color={colors.primary} />
+              <Text style={{ fontSize: fontSize.xs, color: colors.mutedForeground, marginTop: spacing.sm }}>
+                {level.lessonCount} amasomo
+              </Text>
             </View>
-          </TouchableOpacity>
-        ))}
-
-        <View style={{ borderTopWidth: 1, borderColor: colors.border, marginVertical: spacing.lg }} />
-
-        <Text style={{ fontSize: fontSize.lg, fontWeight: "600", color: colors.foreground, marginBottom: spacing.md }}>
-          Hitamo Icyiciro
-        </Text>
-        {MOCK_LEVELS.map((level) => (
-          <TouchableOpacity
-            key={level.id}
-            onPress={() => router.push(`/(tabs)/learn/${level.id}`)}
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              backgroundColor: colors.primaryMuted,
-              borderWidth: 1,
-              borderColor: colors.primary + "40",
-              borderRadius: borderRadius.md,
-              padding: spacing.md,
-              marginBottom: spacing.sm,
-            }}
-          >
-            <View>
-              <Text style={{ fontWeight: "600", color: colors.foreground }}>{level.label}</Text>
-              <Text style={{ fontSize: fontSize.xs, color: colors.mutedForeground }}>{level.lessonCount} amasomo</Text>
-            </View>
-            <Ionicons name="school" size={28} color={colors.primary} />
           </TouchableOpacity>
         ))}
       </ScrollView>
